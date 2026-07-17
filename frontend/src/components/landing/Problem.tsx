@@ -1,4 +1,7 @@
+"use client";
+
 import { ScrollReveal } from "./ScrollReveal";
+import { useCopy } from "@/lib/useCopy";
 
 const dreams = [
   "UPSC Officer",
@@ -20,15 +23,15 @@ const blockers = [
 ];
 
 export function Problem() {
+  const copy = useCopy();
   return (
     <section className="mx-auto w-full max-w-6xl px-6 py-28">
       <ScrollReveal className="mx-auto max-w-2xl text-center">
         <h2 className="font-display text-4xl font-medium tracking-tight text-[#1f1a14] sm:text-6xl">
-          Millions dream. Few execute.
+          {copy["problem.heading"]}
         </h2>
         <p className="mt-5 text-lg leading-8 text-[#6b6155]">
-          It&apos;s not a lack of motivation. Most people never achieve their
-          goals because no one shows them the path.
+          {copy["problem.sub"]}
         </p>
       </ScrollReveal>
 
@@ -68,9 +71,9 @@ export function Problem() {
 
       <ScrollReveal className="mx-auto mt-16 max-w-2xl text-center">
         <p className="text-lg leading-8 text-[#6b6155]">
-          Productivity apps help you organize tasks.{" "}
+          {copy["problem.closing"]}{" "}
           <strong className="font-semibold text-[#1f1a14]">
-            Ascend helps you achieve outcomes.
+            {copy["problem.closingBold"]}
           </strong>
         </p>
       </ScrollReveal>

@@ -69,6 +69,10 @@ interface Db {
   users: User[];
   activity: Activity[];
   payments: PaymentRequest[];
+  // Admin-editable website wording (hero lines, quotes, pricing copy…).
+  // Keys map to fields defined in the frontend copy registry; missing keys
+  // fall back to the defaults hardcoded in the frontend.
+  siteCopy: Record<string, string>;
 }
 
 const dataDir = join(dirname(fileURLToPath(import.meta.url)), "..", "data");
@@ -83,6 +87,7 @@ function parseDb(raw: string): Db {
     users: parsed.users ?? [],
     activity: parsed.activity ?? [],
     payments: parsed.payments ?? [],
+    siteCopy: parsed.siteCopy ?? {},
   };
 }
 
@@ -98,7 +103,7 @@ function loadLocal(): Db {
       console.error(`Failed to read ${path}:`, err);
     }
   }
-  return { users: [], activity: [], payments: [] };
+  return { users: [], activity: [], payments: [], siteCopy: {} };
 }
 
 // On boot, prefer the durable copy in the cloud mirror (Supabase/S3, when
@@ -177,6 +182,15 @@ export function logActivity(type: string, email?: string, detail?: string) {
 
 export function allActivity() {
   return db.activity;
+}
+
+export function getSiteCopy() {
+  return db.siteCopy;
+}
+
+export function setSiteCopy(copy: Record<string, string>) {
+  db.siteCopy = copy;
+  save();
 }
 
 export function findUserByEmail(email: string) {

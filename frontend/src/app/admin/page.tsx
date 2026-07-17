@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, clearSession, getUser, type SessionUser } from "@/lib/api";
-import { GlassCard } from "@/components/ui/Glass";
+import { GlassCard, buttonAccent, inputDark } from "@/components/ui/Glass";
+import { COPY_SECTIONS, DEFAULT_COPY } from "@/lib/copy";
 
 interface AdminUser extends SessionUser {
   goal: string | null;
@@ -42,7 +43,7 @@ interface Analytics {
   users: AdminUser[];
 }
 
-const TABS = ["Users", "Payments", "Analytics", "Activity"] as const;
+const TABS = ["Users", "Payments", "Content", "Analytics", "Activity"] as const;
 
 function fmt(iso: string | null | undefined) {
   if (!iso) return "—";
@@ -80,6 +81,157 @@ function Toggle({
         }`}
       />
     </button>
+  );
+}
+
+/**
+ * Website-wording editor: every headline/quote on the landing page, grouped
+ * by section. Saved text goes live immediately; clearing a field (or Reset)
+ * restores the original wording.
+ */
+function ContentEditor() {
+  const [baseline, setBaseline] = useState<Record<string, string> | null>(null);
+  const [draft, setDraft] = useState<Record<string, string>>({});
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    api<{ copy: Record<string, string> }>("/content")
+      .then((r) => {
+        const effective = { ...DEFAULT_COPY, ...(r.copy ?? {}) };
+        setBaseline(effective);
+        setDraft(effective);
+      })
+      .catch((err) => setError((err as Error).message));
+  }, []);
+
+  if (error) return <p className="text-sm text-[#b5551f]">{error}</p>;
+  if (!baseline)
+    return (
+      <p className="animate-pulse text-sm text-[#9a8f80]">Loading content…</p>
+    );
+
+  const dirty = Object.keys(DEFAULT_COPY).some(
+    (k) => (draft[k] ?? "") !== baseline[k],
+  );
+
+  async function saveAll() {
+    setSaving(true);
+    setError("");
+    try {
+      // Only store wording that differs from the built-in default.
+      const overrides: Record<string, string> = {};
+      for (const [key, def] of Object.entries(DEFAULT_COPY)) {
+        const value = (draft[key] ?? "").trim();
+        if (value && value !== def) overrides[key] = value;
+      }
+      await api("/admin/content", { method: "PUT", body: { copy: overrides } });
+      const effective = { ...DEFAULT_COPY, ...overrides };
+      setBaseline(effective);
+      setDraft(effective);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#a8721f]/25 bg-[#a8721f]/[0.06] px-5 py-3.5">
+        <p className="text-[13px] text-[#6b6155]">
+          Edit the wording shown on the landing page. Changes go live the moment
+          you save — clear a field or press Reset to restore the original text.
+        </p>
+        <div className="flex items-center gap-3">
+          {saved && (
+            <span className="text-[13px] font-medium text-[#5a7d2a]">
+              Saved ✓ — live on the site
+            </span>
+          )}
+          <button
+            onClick={saveAll}
+            disabled={!dirty || saving}
+            className={buttonAccent}
+          >
+            {saving ? "Saving…" : "Save changes"}
+          </button>
+        </div>
+      </div>
+
+      {COPY_SECTIONS.map((section) => (
+        <GlassCard key={section.title} title={section.title}>
+          <p className="-mt-3 mb-5 text-[13px] text-[#9a8f80]">
+            {section.hint}
+          </p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {section.fields.map((f) => {
+              const value = draft[f.key] ?? "";
+              const edited = value.trim() !== f.default;
+              return (
+                <label
+                  key={f.key}
+                  className={f.multiline ? "block md:col-span-2" : "block"}
+                >
+                  <span className="mb-1.5 flex items-center justify-between">
+                    <span className="text-[12px] font-medium tracking-wide text-[#6b6155] uppercase">
+                      {f.label}
+                      {edited && (
+                        <span className="ml-2 inline-block h-1.5 w-1.5 rounded-full bg-[#a8721f] align-middle" />
+                      )}
+                    </span>
+                    {edited && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setDraft((d) => ({ ...d, [f.key]: f.default }))
+                        }
+                        className="text-[12px] text-[#9a8f80] underline-offset-2 hover:text-[#a8721f] hover:underline"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </span>
+                  {f.multiline ? (
+                    <textarea
+                      value={value}
+                      rows={3}
+                      placeholder={f.default}
+                      onChange={(e) =>
+                        setDraft((d) => ({ ...d, [f.key]: e.target.value }))
+                      }
+                      className={`${inputDark} resize-y leading-6`}
+                    />
+                  ) : (
+                    <input
+                      value={value}
+                      placeholder={f.default}
+                      onChange={(e) =>
+                        setDraft((d) => ({ ...d, [f.key]: e.target.value }))
+                      }
+                      className={inputDark}
+                    />
+                  )}
+                </label>
+              );
+            })}
+          </div>
+        </GlassCard>
+      ))}
+
+      <div className="flex justify-end">
+        <button
+          onClick={saveAll}
+          disabled={!dirty || saving}
+          className={buttonAccent}
+        >
+          {saving ? "Saving…" : "Save changes"}
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -174,6 +326,13 @@ export default function AdminPage() {
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
+            <a
+              href="/"
+              target="_blank"
+              className="rounded-full border border-[#1f1a14]/[0.16] bg-white px-4 py-1.5 text-sm whitespace-nowrap text-[#6b6155] transition-colors hover:bg-[#faf6ee] hover:text-[#1f1a14]"
+            >
+              View site ↗
+            </a>
             <button
               onClick={load}
               className="rounded-full border border-[#1f1a14]/[0.16] bg-white px-4 py-1.5 text-sm whitespace-nowrap text-[#6b6155] transition-colors hover:bg-[#faf6ee] hover:text-[#1f1a14]"
@@ -478,6 +637,8 @@ export default function AdminPage() {
               )}
             </div>
           )}
+
+          {tab === "Content" && <ContentEditor />}
 
           {tab === "Analytics" && (
             <GlassCard title="Activity by type" gradient>

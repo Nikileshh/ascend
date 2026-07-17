@@ -12,8 +12,10 @@ import {
   findPaymentById,
   findUserByEmail,
   findUserById,
+  getSiteCopy,
   logActivity,
   save,
+  setSiteCopy,
   trialInfo,
   type PaymentRequest,
   type User,
@@ -81,6 +83,36 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
+// --- Site content (admin-editable wording, public read) ---
+
+app.get("/content", (_req, res) => {
+  res.json({ copy: getSiteCopy() });
+});
+
+app.put(
+  "/admin/content",
+  requireAuth,
+  requireAdmin,
+  (req: AuthedRequest, res) => {
+    const input = req.body?.copy;
+    if (!input || typeof input !== "object" || Array.isArray(input))
+      return res.status(400).json({ error: "copy object required" });
+    const copy: Record<string, string> = {};
+    for (const [key, value] of Object.entries(input)) {
+      if (typeof value !== "string") continue;
+      const trimmed = value.trim();
+      if (trimmed) copy[key] = trimmed.slice(0, 1000);
+    }
+    setSiteCopy(copy);
+    logActivity(
+      "content_edit",
+      req.user!.email,
+      `${Object.keys(copy).length} fields`,
+    );
+    res.json({ copy });
+  },
+);
+
 // --- Auth (Gmail-only, verified via emailed OTP) ---
 
 function newVerifyCode(user: User) {
@@ -93,11 +125,9 @@ app.post("/auth/register", async (req, res) => {
   if (!name || !email || !password)
     return res.status(400).json({ error: "name, email, password required" });
   if (!/^[^\s@]+@gmail\.com$/i.test(email))
-    return res
-      .status(400)
-      .json({
-        error: "Only Gmail accounts are allowed. Use your @gmail.com address.",
-      });
+    return res.status(400).json({
+      error: "Only Gmail accounts are allowed. Use your @gmail.com address.",
+    });
   if (findUserByEmail(email))
     return res.status(409).json({ error: "Email already registered" });
 

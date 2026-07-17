@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { api, getUser } from "@/lib/api";
+import { useIsClient } from "@/lib/useIsClient";
 import { usePlan } from "@/lib/usePlan";
 import { GlassCard, CoachBadge } from "@/components/ui/Glass";
 import { RichText } from "@/components/ui/RichText";
@@ -27,30 +28,37 @@ function slotRange(time: string) {
 export default function OverviewPage() {
   const { plan, habitLog, error } = usePlan();
   const [coach, setCoach] = useState("");
-  const [hello, setHello] = useState("Welcome");
-  const [today, setToday] = useState("");
-  const [marked, setMarked] = useState<Record<string, string>>({});
+  // The user's clicks this session, layered over the server's habit log.
+  const [touched, setTouched] = useState<Record<string, "done" | "clear">>({});
 
   const todayKey = new Date().toISOString().slice(0, 10);
 
-  useEffect(() => {
-    const u = getUser();
-    setHello(`${greeting()}, ${u ? u.name.split(" ")[0] : "there"}`);
-    setToday(
-      new Date().toLocaleDateString("en", {
+  // Greeting and date are client-only values (clock + localStorage), derived
+  // at render once hydration completes.
+  const isClient = useIsClient();
+  const user = isClient ? getUser() : null;
+  const hello = isClient
+    ? `${greeting()}, ${user ? user.name.split(" ")[0] : "there"}`
+    : "Welcome";
+  const today = isClient
+    ? new Date().toLocaleDateString("en", {
         weekday: "short",
         month: "short",
         day: "numeric",
-      }),
-    );
+      })
+    : "";
+
+  useEffect(() => {
     api<{ coach: string }>("/agents/briefing")
       .then((r) => setCoach(r.coach))
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
-    setMarked(habitLog[todayKey] ?? {});
-  }, [habitLog, todayKey]);
+  const marked: Record<string, string> = { ...(habitLog[todayKey] ?? {}) };
+  for (const [habit, status] of Object.entries(touched)) {
+    if (status === "clear") delete marked[habit];
+    else marked[habit] = "done";
+  }
 
   if (error) return <p className="p-10 text-sm text-[#b5551f]">{error}</p>;
   if (!plan)
@@ -61,17 +69,18 @@ export default function OverviewPage() {
     );
 
   async function toggleHabit(habit: string) {
-    const isDone = marked[habit] === "done";
-    const next = { ...marked };
-    if (isDone) delete next[habit];
-    else next[habit] = "done";
-    setMarked(next);
+    const next = marked[habit] === "done" ? "clear" : "done";
+    setTouched((t) => ({ ...t, [habit]: next }));
     try {
       await api("/agents/habits/log", {
-        body: { date: todayKey, habit, status: isDone ? "clear" : "done" },
+        body: { date: todayKey, habit, status: next },
       });
     } catch {
-      setMarked(marked); // revert
+      setTouched((t) => {
+        const rest = { ...t }; // revert this click
+        delete rest[habit];
+        return rest;
+      });
     }
   }
 

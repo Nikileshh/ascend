@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { api, clearSession, getUser } from "@/lib/api";
+import { api, clearSession, getUser, type SessionUser } from "@/lib/api";
+import { useIsClient } from "@/lib/useIsClient";
 
 const tabs = [
   {
@@ -70,24 +71,27 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [reminder, setReminder] = useState<Slot | null>(null);
-  const [name, setName] = useState("");
-  const [premium, setPremium] = useState(false);
+  const [freshUser, setFreshUser] = useState<SessionUser | null>(null);
   const timetableRef = useRef<Slot[]>([]);
   const notifiedRef = useRef<Set<string>>(new Set());
 
+  // Session data is derived at render (hydration-safe via useIsClient), then
+  // refreshed from the server so admin-granted premium reflects without
+  // re-login.
+  const isClient = useIsClient();
+  const user = freshUser ?? (isClient ? getUser() : null);
+  const name = user?.name ?? "";
+  const premium = !!user && (!!user.premium || user.role === "admin");
+
   useEffect(() => {
-    const u = getUser();
-    if (!u) {
+    if (!getUser()) {
       router.replace("/login");
       return;
     }
-    setName(u.name);
-    setPremium(!!u.premium || u.role === "admin");
-    // Refresh from the server so admin-granted premium reflects without re-login.
-    api<{ user: typeof u }>("/auth/me")
+    api<{ user: SessionUser }>("/auth/me")
       .then(({ user }) => {
         localStorage.setItem("ascend_user", JSON.stringify(user));
-        setPremium(!!user.premium || user.role === "admin");
+        setFreshUser(user);
       })
       .catch(() => {});
   }, [router]);

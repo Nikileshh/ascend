@@ -1,11 +1,12 @@
+"use client";
+
 import { ScrollReveal } from "./ScrollReveal";
+import { useCopy } from "@/lib/useCopy";
 
 const plan = {
   name: "Ascend",
   price: "₹250",
   period: "/month",
-  description:
-    "One plan. Everything included. Start with a 14-day free trial — no card required.",
   features: [
     "Unlimited goals & AI analyses",
     "Full personalized roadmap with milestones",
@@ -14,19 +15,18 @@ const plan = {
     "Weekly AI progress reviews",
     "AI coach that adapts to you",
   ],
-  trialNote:
-    "Free trial includes a preview AI analysis. Full features unlock with the plan.",
 };
 
 export function Pricing() {
+  const copy = useCopy();
   return (
     <section id="pricing" className="mx-auto w-full max-w-6xl px-6 py-28">
       <ScrollReveal className="mx-auto max-w-2xl text-center">
         <h2 className="font-display text-4xl font-medium tracking-tight text-[#1f1a14] sm:text-6xl">
-          One plan. Two weeks free.
+          {copy["pricing.heading"]}
         </h2>
         <p className="mt-5 text-lg leading-8 text-[#6b6155]">
-          Try Ascend free for 14 days, then ₹250/month. No tiers, no upsells.
+          {copy["pricing.sub"]}
         </p>
       </ScrollReveal>
 
@@ -46,7 +46,9 @@ export function Pricing() {
             </span>
             <span className="text-sm text-[#6b6155]"> {plan.period}</span>
           </p>
-          <p className="mt-2 text-sm text-[#6b6155]">{plan.description}</p>
+          <p className="mt-2 text-sm text-[#6b6155]">
+            {copy["pricing.description"]}
+          </p>
           <ul className="mt-6 flex-1 space-y-3">
             {plan.features.map((feature) => (
               <li
@@ -58,7 +60,9 @@ export function Pricing() {
               </li>
             ))}
           </ul>
-          <p className="mt-6 text-xs text-[#9a8f80]">{plan.trialNote}</p>
+          <p className="mt-6 text-xs text-[#9a8f80]">
+            {copy["pricing.trialNote"]}
+          </p>
           <a
             href="/register"
             className="mt-6 rounded-full bg-gradient-to-b from-[#2a231b] to-[#1f1a14] px-6 py-3 text-center text-sm font-medium text-[#f7f1e6] shadow-[0_8px_24px_rgba(31,26,20,0.24)] transition-all duration-200 hover:-translate-y-0.5"
