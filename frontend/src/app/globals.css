@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Warm editorial theme — one light theme, no OS dark override so text is
+     always visible regardless of the visitor's system color scheme. */
+  color-scheme: light;
+  --background: #f4efe6;
+  --foreground: #1f1a14;
 }
 
 @theme inline {
@@ -10,19 +13,26 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: var(--font-cormorant), Georgia, serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Form controls follow the light theme even on dark-mode systems, and typed
+   text is always the dark ink so it can never be white-on-white. */
+input,
+textarea,
+select {
+  color: #1f1a14;
+  color-scheme: light;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #9a8f80;
 }
 
 html {
@@ -69,6 +79,19 @@ html {
   }
 }
 
+/* Slow cinematic zoom/pan for the dashboard photo backdrop */
+@keyframes ken-burns {
+  0% {
+    transform: scale(1.08) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.18) translate(-2%, -1.5%);
+  }
+  100% {
+    transform: scale(1.08) translate(0, 0);
+  }
+}
+
 .animate-fade-up {
   animation: fade-up 0.8s ease-out both;
 }
@@ -91,6 +114,10 @@ html {
   background-size: 200% auto;
   animation: shimmer 4s linear infinite;
 }
+.animate-ken-burns {
+  animation: ken-burns 40s ease-in-out infinite;
+  will-change: transform;
+}
 
 /* reveal-on-scroll (used with a tiny IntersectionObserver) */
 .reveal {
@@ -112,7 +139,8 @@ html {
   .animate-fade-up-3,
   .animate-float,
   .animate-blob,
-  .animate-shimmer {
+  .animate-shimmer,
+  .animate-ken-burns {
     animation: none;
   }
   .reveal {

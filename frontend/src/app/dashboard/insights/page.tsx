@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { Card } from "@/components/ui/Card";
+import { GlassCard } from "@/components/ui/Glass";
 import { RichText } from "@/components/ui/RichText";
 
 export default function InsightsPage() {
@@ -18,25 +18,31 @@ export default function InsightsPage() {
       .catch((err) => setError((err as Error).message));
   }, []);
 
-  if (error) return <p className="text-sm text-red-500">{error}</p>;
-  if (!data)
-    return (
-      <p className="animate-pulse text-sm text-zinc-500">
-        Analyzing your patterns…
-      </p>
-    );
-
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-white">
-        AI insights
+    <main className="mx-auto max-w-[820px] px-5 py-10 sm:px-8 sm:py-14 md:px-12">
+      <h1 className="font-display text-[32px] leading-tight font-medium tracking-tight text-[#1f1a14] sm:text-[42px]">
+        Insights
       </h1>
-      <Card title="Patterns & adjustments">
-        <RichText text={data.analytics} />
-      </Card>
-      <Card title="Where you stand">
-        <RichText text={data.motivation} />
-      </Card>
-    </div>
+      <p className="mt-2 text-[16px] text-[#6b6155]">
+        What your patterns say, and where you stand.
+      </p>
+
+      {error && <p className="mt-6 text-[15px] text-[#b5551f]">{error}</p>}
+      {!data && !error && (
+        <p className="mt-8 animate-pulse text-[15px] text-[#9a8f80]">
+          Analyzing your patterns…
+        </p>
+      )}
+      {data && (
+        <div className="mt-8 flex flex-col gap-6">
+          <GlassCard gradient title="Patterns & adjustments">
+            <RichText text={data.analytics} />
+          </GlassCard>
+          <GlassCard title="Where you stand">
+            <RichText text={data.motivation} />
+          </GlassCard>
+        </div>
+      )}
+    </main>
   );
 }

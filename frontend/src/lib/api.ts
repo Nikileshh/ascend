@@ -10,6 +10,8 @@ export interface SessionUser {
   trialEndsAt: string;
   trialExpired: boolean;
   daysLeft: number;
+  premium?: boolean;
+  premiumSince?: string;
 }
 
 export function getToken() {

@@ -74,7 +74,7 @@ export function InkMask() {
           y="-1"
           width="102"
           height="102"
-          className="fill-white dark:fill-black"
+          className="fill-[#0b0b10]"
         />
       </g>
     </svg>

@@ -15,7 +15,12 @@ export interface Plan {
     skillsRequired: string[];
     risks: string[];
   };
-  roadmap: { month: number; title: string; objectives: string[] }[];
+  roadmap: {
+    month: number;
+    title: string;
+    objectives: string[];
+    weeks?: { week: number; focus: string }[];
+  }[];
   timetable: { time: string; activity: string }[];
   habits: { name: string; frequency: string; why: string }[];
 }

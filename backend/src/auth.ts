@@ -18,6 +18,14 @@ export function publicUser(user: User) {
     passwordHash: _passwordHash,
     plan: _plan,
     memory: _memory,
+    verifyCode: _verifyCode,
+    verifyExpires: _verifyExpires,
+    resetCode: _resetCode,
+    resetExpires: _resetExpires,
+    briefingCache: _briefingCache,
+    insightsCache: _insightsCache,
+    habitLog: _habitLog,
+    chat: _chat,
     ...rest
   } = user;
   return { ...rest, ...trialInfo(user) };

@@ -1,11 +1,14 @@
 // All knobs for the cinematic intro live here: colors, timings, and copy.
 export const introConfig = {
   colors: {
-    night: "#070b1a",
-    nightGlow: "#1b2550",
-    gold: "#d4af37",
-    goldLight: "#f3d98b",
+    night: "#0a0a0a",
+    nightGlow: "#1a1713",
+    // beige typography over the photo background
+    gold: "#e6d5b8",
+    goldLight: "#f5ead6",
   },
+  /** photo shown behind the logo (place the file in frontend/public/) */
+  backgroundImage: "/intro-bg.jpg",
   scroll: {
     /** how much scrolling (as % of viewport height) the wipe takes */
     distance: 130,

@@ -1,3 +1,5 @@
+import { ScrollReveal } from "./ScrollReveal";
+
 const roadmap = [
   { month: "Month 1", focus: "Learn web development · Build portfolio" },
   { month: "Month 2", focus: "Cold outreach · Create LinkedIn presence" },
@@ -73,105 +75,107 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="border-y border-black/5 bg-zinc-50 dark:border-white/10 dark:bg-zinc-950"
+      className="border-y border-[#1f1a14]/[0.08] bg-[#faf6ee]"
     >
-      <div className="mx-auto w-full max-w-6xl px-6 py-24">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-semibold tracking-tight text-black sm:text-5xl dark:text-white">
+      <div className="mx-auto w-full max-w-6xl px-6 py-28">
+        <ScrollReveal className="mx-auto max-w-2xl text-center">
+          <h2 className="font-display text-4xl font-medium tracking-tight text-[#1f1a14] sm:text-6xl">
             You answer questions.
             <br />
-            The AI builds everything else.
+            <span className="bg-gradient-to-r from-[#c79a4a] to-[#a8721f] bg-clip-text text-transparent">
+              The AI builds everything else.
+            </span>
           </h2>
-        </div>
+        </ScrollReveal>
 
-        <div className="mt-16 grid gap-6 sm:grid-cols-2">
+        <ScrollReveal
+          className="mt-16 grid gap-5 sm:grid-cols-2"
+          stagger={0.12}
+        >
           {steps.map((step) => (
             <div
               key={step.number}
-              className="rounded-3xl border border-black/5 bg-white p-8 dark:border-white/10 dark:bg-zinc-900"
+              className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 backdrop-blur-xl transition-colors hover:border-[#a8721f]/40"
             >
-              <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+              <span className="font-mono text-sm font-semibold text-[#a8721f]">
                 {step.number}
               </span>
-              <h3 className="mt-3 text-xl font-semibold text-black dark:text-white">
+              <h3 className="mt-3 text-xl font-semibold text-[#1f1a14]">
                 {step.title}
               </h3>
-              <p className="mt-2 leading-7 text-zinc-600 dark:text-zinc-400">
+              <p className="mt-2 leading-7 text-[#6b6155]">
                 {step.description}
               </p>
             </div>
           ))}
-        </div>
+        </ScrollReveal>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-3xl border border-black/5 bg-white p-8 dark:border-white/10 dark:bg-zinc-900">
-            <p className="text-sm font-medium text-zinc-500">
+        <ScrollReveal className="mt-5 grid gap-5 lg:grid-cols-2" stagger={0.15}>
+          <div className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-br from-[#a8721f]/10 via-white/[0.03] to-white/[0.03] p-8 backdrop-blur-xl">
+            <p className="text-sm font-medium text-[#9a8f80]">
               Example roadmap · Build a ₹1 lakh/month agency
             </p>
             <ul className="mt-5 space-y-4">
               {roadmap.map((item) => (
                 <li key={item.month} className="flex gap-4">
-                  <span className="w-20 shrink-0 text-sm font-semibold text-blue-600 dark:text-blue-400">
+                  <span className="w-20 shrink-0 font-mono text-sm font-semibold text-[#a8721f]">
                     {item.month}
                   </span>
-                  <span className="text-sm text-zinc-700 dark:text-zinc-300">
-                    {item.focus}
-                  </span>
+                  <span className="text-sm text-[#4a4239]">{item.focus}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="rounded-3xl border border-black/5 bg-white p-8 dark:border-white/10 dark:bg-zinc-900">
-            <p className="text-sm font-medium text-zinc-500">
+          <div className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 backdrop-blur-xl">
+            <p className="text-sm font-medium text-[#9a8f80]">
               Example timetable · Generated for your energy and commitments
             </p>
             <ul className="mt-5 space-y-3">
               {timetable.map((slot) => (
                 <li key={slot.time} className="flex gap-4">
-                  <span className="w-20 shrink-0 font-mono text-sm text-zinc-500">
+                  <span className="w-20 shrink-0 font-mono text-sm text-[#9a8f80]">
                     {slot.time}
                   </span>
-                  <span className="text-sm text-zinc-700 dark:text-zinc-300">
+                  <span className="text-sm text-[#4a4239]">
                     {slot.activity}
                   </span>
                 </li>
               ))}
             </ul>
           </div>
-        </div>
+        </ScrollReveal>
 
-        <div className="mt-16">
-          <div className="mx-auto max-w-2xl text-center">
-            <h3 className="text-2xl font-semibold tracking-tight text-black sm:text-3xl dark:text-white">
+        <div className="mt-20">
+          <ScrollReveal className="mx-auto max-w-2xl text-center">
+            <h3 className="font-display text-3xl font-medium tracking-tight text-[#1f1a14] sm:text-4xl">
               Habits built for your goal — not generic checklists
             </h3>
-          </div>
-          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+          </ScrollReveal>
+          <ScrollReveal
+            className="mt-10 grid gap-5 sm:grid-cols-3"
+            stagger={0.12}
+          >
             {habitSets.map((set) => (
               <div
                 key={set.goal}
-                className="rounded-3xl border border-black/5 bg-white p-6 dark:border-white/10 dark:bg-zinc-900"
+                className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-6 backdrop-blur-xl transition-colors hover:border-[#a8721f]/40"
               >
-                <p className="font-semibold text-black dark:text-white">
-                  {set.goal}
-                </p>
+                <p className="font-semibold text-[#1f1a14]">{set.goal}</p>
                 <ul className="mt-4 space-y-2">
                   {set.habits.map((habit) => (
                     <li
                       key={habit}
-                      className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400"
+                      className="flex items-center gap-2 text-sm text-[#6b6155]"
                     >
-                      <span className="text-blue-600 dark:text-blue-400">
-                        ✓
-                      </span>
+                      <span className="text-[#a8721f]">✓</span>
                       {habit}
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
-          </div>
+          </ScrollReveal>
         </div>
       </div>
     </section>

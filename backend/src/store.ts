@@ -9,6 +9,7 @@ import {
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Plan, UserMemory } from "./agents.js";
+import { remoteEnabled, remoteGetDb, remotePutDb } from "./remote.js";
 
 export interface ChatMessage {
   role: "user" | "coach";
@@ -23,6 +24,19 @@ export interface Activity {
   detail?: string;
 }
 
+export interface PaymentRequest {
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+  amount: number;
+  upiRef: string; // the UPI/GPay transaction reference the user typed in
+  status: "pending" | "approved" | "rejected";
+  createdAt: string;
+  reviewedAt?: string;
+  reviewedBy?: string; // admin email
+}
+
 export interface User {
   id: string;
   name: string;
@@ -31,8 +45,21 @@ export interface User {
   role: "admin" | "user";
   createdAt: string; // ISO — trial starts at registration
   analysisCount: number;
+  // Premium: granted by admin (toggle) or by approving a payment request
+  premium?: boolean;
+  premiumSince?: string;
+  // Email verification (users without the field are grandfathered as verified)
+  verified?: boolean;
+  verifyCode?: string;
+  verifyExpires?: string;
+  // Password reset via emailed PIN
+  resetCode?: string;
+  resetExpires?: string;
   plan?: Plan;
   memory?: UserMemory;
+  // one AI call per day per section — cached to conserve API quota
+  briefingCache?: { date: string; text: string };
+  insightsCache?: { date: string; analytics: string; motivation: string };
   // habitLog[date][habitName] = "done" | "missed"
   habitLog?: Record<string, Record<string, "done" | "missed">>;
   chat?: ChatMessage[];
@@ -41,6 +68,7 @@ export interface User {
 interface Db {
   users: User[];
   activity: Activity[];
+  payments: PaymentRequest[];
 }
 
 const dataDir = join(dirname(fileURLToPath(import.meta.url)), "..", "data");
@@ -49,24 +77,73 @@ const tmpPath = join(dataDir, "db.json.tmp");
 const backupPath = join(dataDir, "db.backup.json");
 const snapshotsDir = join(dataDir, "snapshots");
 
-function load(): Db {
+function parseDb(raw: string): Db {
+  const parsed = JSON.parse(raw) as Partial<Db>;
+  return {
+    users: parsed.users ?? [],
+    activity: parsed.activity ?? [],
+    payments: parsed.payments ?? [],
+  };
+}
+
+function loadLocal(): Db {
   for (const path of [dbPath, backupPath]) {
     try {
       if (existsSync(path)) {
-        const parsed = JSON.parse(readFileSync(path, "utf8")) as Partial<Db>;
         if (path === backupPath)
           console.warn("db.json unreadable — recovered from db.backup.json");
-        return { users: parsed.users ?? [], activity: parsed.activity ?? [] };
+        return parseDb(readFileSync(path, "utf8"));
       }
     } catch (err) {
       console.error(`Failed to read ${path}:`, err);
     }
   }
-  return { users: [], activity: [] };
+  return { users: [], activity: [], payments: [] };
 }
 
-const db = load();
+// On boot, prefer the durable copy in the cloud mirror (Supabase/S3, when
+// enabled) and seed a local cache from it; otherwise fall back to the local
+// file. Any mirror failure is non-fatal — the app always has the local db.
+async function loadInitial(): Promise<Db> {
+  if (remoteEnabled) {
+    const remote = await remoteGetDb();
+    if (remote) {
+      try {
+        const parsed = parseDb(remote);
+        mkdirSync(dataDir, { recursive: true });
+        writeFileSync(dbPath, JSON.stringify(parsed, null, 2));
+        console.log(
+          `[store] loaded database from cloud mirror (${parsed.users.length} users)`,
+        );
+        return parsed;
+      } catch (err) {
+        console.warn(
+          "[store] remote db unparseable, using local:",
+          (err as Error).message,
+        );
+      }
+    } else {
+      console.log(
+        "[store] no database in the cloud mirror yet — starting from local/empty",
+      );
+    }
+  }
+  return loadLocal();
+}
+
+const db = await loadInitial();
 let lastSnapshotDay = "";
+
+// Mirror to the cloud after writes, debounced so a burst of saves is one write.
+let remoteTimer: ReturnType<typeof setTimeout> | null = null;
+function mirrorRemote() {
+  if (!remoteEnabled) return;
+  if (remoteTimer) clearTimeout(remoteTimer);
+  remoteTimer = setTimeout(() => {
+    remoteTimer = null;
+    void remotePutDb(JSON.stringify(db, null, 2));
+  }, 1500);
+}
 
 /**
  * Crash-safe persistence: the previous good file is kept as a backup,
@@ -86,6 +163,8 @@ export function save() {
     copyFileSync(dbPath, join(snapshotsDir, `db-${day}.json`));
     lastSnapshotDay = day;
   }
+
+  mirrorRemote(); // durable copy in Supabase/S3 when STORE_DRIVER is set
 }
 
 export function logActivity(type: string, email?: string, detail?: string) {
@@ -117,7 +196,25 @@ export function allUsers() {
   return db.users;
 }
 
-const TRIAL_DAYS = 7;
+export function addPayment(payment: PaymentRequest) {
+  db.payments.push(payment);
+  save();
+}
+
+export function allPayments() {
+  return db.payments;
+}
+
+export function findPaymentById(id: string) {
+  return db.payments.find((p) => p.id === id);
+}
+
+/** Whether the user currently has full access (admin, premium, or in trial). */
+export function isPremium(user: User) {
+  return user.role === "admin" || user.premium === true;
+}
+
+const TRIAL_DAYS = 14;
 
 export function trialInfo(user: User) {
   const trialEndsAt = new Date(

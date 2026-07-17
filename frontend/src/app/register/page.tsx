@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api, setSession, type SessionUser } from "@/lib/api";
 import { AuthCard, buttonClass, inputClass } from "@/components/ui/AuthCard";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -12,7 +13,10 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [code, setCode] = useState("");
+  const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
@@ -24,9 +28,24 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
+      await api("/auth/register", { body: { name, email, password } });
+      setVerifying(true);
+      setNotice(`We emailed a 6-digit code to ${email}.`);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function onVerify(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
       const { token, user } = await api<{ token: string; user: SessionUser }>(
-        "/auth/register",
-        { body: { name, email, password } },
+        "/auth/verify",
+        { body: { email, code } },
       );
       setSession(token, user);
       router.push("/onboarding");
@@ -37,10 +56,55 @@ export default function RegisterPage() {
     }
   }
 
+  async function resend() {
+    setError("");
+    try {
+      await api("/auth/resend", { body: { email } });
+      setNotice(`A new code is on its way to ${email}.`);
+    } catch (err) {
+      setError((err as Error).message);
+    }
+  }
+
+  if (verifying) {
+    return (
+      <AuthCard
+        title="Verify your Gmail"
+        subtitle={notice || `Enter the 6-digit code we sent to ${email}.`}
+      >
+        <form onSubmit={onVerify} className="space-y-4">
+          <input
+            required
+            inputMode="numeric"
+            pattern="\d{6}"
+            maxLength={6}
+            placeholder="6-digit code"
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
+            className={`${inputClass} text-center font-mono text-lg tracking-[0.5em]`}
+          />
+          {error && <p className="text-sm text-[#b5551f]">{error}</p>}
+          <button type="submit" disabled={loading} className={buttonClass}>
+            {loading ? "Verifying…" : "Verify & continue"}
+          </button>
+        </form>
+        <p className="mt-5 text-center text-sm text-[#6b6155]">
+          Didn&apos;t get it? Check spam, or{" "}
+          <button
+            onClick={resend}
+            className="font-medium text-[#a8721f] hover:underline"
+          >
+            resend the code
+          </button>
+        </p>
+      </AuthCard>
+    );
+  }
+
   return (
     <AuthCard
-      title="Start your 1-week free trial"
-      subtitle="One plan: ₹250/month after your trial. A confirmation email is sent when you register."
+      title="Start your 14-day free trial"
+      subtitle="Sign up with your Gmail — we'll send a code to verify it's really you."
     >
       <form onSubmit={onSubmit} className="space-y-4">
         <input
@@ -53,37 +117,36 @@ export default function RegisterPage() {
         <input
           type="email"
           required
-          placeholder="Email"
+          placeholder="yourname@gmail.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className={inputClass}
         />
-        <input
-          type="password"
+        <PasswordInput
           required
           minLength={6}
           placeholder="Password (min 6 characters)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className={inputClass}
         />
-        <input
-          type="password"
+        <PasswordInput
           required
           minLength={6}
           placeholder="Confirm password"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          className={inputClass}
         />
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-[#b5551f]">{error}</p>}
         <button type="submit" disabled={loading} className={buttonClass}>
           {loading ? "Creating account…" : "Create account"}
         </button>
       </form>
-      <p className="mt-4 text-center text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mt-5 text-center text-sm text-[#6b6155]">
         Already have an account?{" "}
-        <Link href="/login" className="text-blue-600 dark:text-blue-400">
+        <Link
+          href="/login"
+          className="font-medium text-[#a8721f] hover:underline"
+        >
           Log in
         </Link>
       </p>

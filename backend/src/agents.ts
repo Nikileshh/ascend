@@ -1,4 +1,4 @@
-import { gemini, extractJson } from "./ai.js";
+import { llm, llmChat, extractJson, type ChatTurn } from "./ai.js";
 
 export interface QA {
   question: string;
@@ -15,10 +15,16 @@ export interface GoalProfile {
   risks: string[];
 }
 
+export interface RoadmapWeek {
+  week: number; // 1-4 within the month
+  focus: string; // what to complete that week
+}
+
 export interface RoadmapMonth {
   month: number;
   title: string;
   objectives: string[];
+  weeks: RoadmapWeek[];
 }
 
 export interface TimetableSlot {
@@ -53,8 +59,8 @@ export interface Plan {
   createdAt: string;
 }
 
-// When Gemini is unreachable (missing/invalid key), agents fall back to
-// sample output so the app stays fully usable in development.
+// When the AI is unreachable (missing/invalid key, quota, timeout), agents
+// fall back to sample output so the app stays fully usable.
 async function withFallback<T>(
   agent: string,
   call: () => Promise<T>,
@@ -64,12 +70,78 @@ async function withFallback<T>(
     return await call();
   } catch (err) {
     console.warn(
-      `[${agent}] Gemini unavailable, using sample output:`,
+      `[${agent}] LLM unavailable, using sample output:`,
       (err as Error).message,
     );
     return fallback;
   }
 }
+
+// JSON Schemas for structured (Ollama-constrained) outputs — one per agent
+// that must return machine-readable data. These guarantee the exact shape.
+const strings = { type: "array", items: { type: "string" } } as const;
+const questionsSchema = strings;
+const profileSchema = {
+  type: "object",
+  properties: {
+    goalDifficulty: { type: "string" },
+    estimatedMonths: { type: "number" },
+    dailyHours: { type: "number" },
+    weeklyHours: { type: "number" },
+    confidence: { type: "number" },
+    skillsRequired: strings,
+    risks: strings,
+  },
+  required: [
+    "goalDifficulty",
+    "estimatedMonths",
+    "dailyHours",
+    "weeklyHours",
+    "confidence",
+    "skillsRequired",
+    "risks",
+  ],
+} as const;
+const roadmapSchema = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      month: { type: "number" },
+      title: { type: "string" },
+      objectives: strings,
+      weeks: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: { week: { type: "number" }, focus: { type: "string" } },
+          required: ["week", "focus"],
+        },
+      },
+    },
+    required: ["month", "title", "objectives", "weeks"],
+  },
+} as const;
+const timetableSchema = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: { time: { type: "string" }, activity: { type: "string" } },
+    required: ["time", "activity"],
+  },
+} as const;
+const habitsSchema = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      name: { type: "string" },
+      frequency: { type: "string" },
+      why: { type: "string" },
+    },
+    required: ["name", "frequency", "why"],
+  },
+} as const;
 
 function qaText(qa: QA[]) {
   return qa.map((x) => `Q: ${x.question}\nA: ${x.answer}`).join("\n");
@@ -96,11 +168,12 @@ export function goalAgentQuestions(goal: string): Promise<string[]> {
 }
 
 async function goalAgentQuestionsLive(goal: string): Promise<string[]> {
-  const text = await gemini(
+  const text = await llm(
     `You are the Goal Analysis Agent of Ascend, a personal AI coaching app.
 A user has this goal: "${goal}".
 Ask exactly 7 short, intelligent follow-up questions to understand: their current level/situation, deadline or target attempt, available hours per day, their usual wake-up time AND sleep time (one question asking both — needed to build their timetable), weakest area, other commitments (work/college), and preferred working/study timings — all tailored to this specific goal.
 Respond with ONLY a JSON array of 7 strings.`,
+    { schema: questionsSchema },
   );
   return extractJson<string[]>(text);
 }
@@ -122,11 +195,12 @@ async function goalAgentAnalyzeLive(
   goal: string,
   qa: QA[],
 ): Promise<GoalProfile> {
-  const text = await gemini(
+  const text = await llm(
     `You are the Goal Analysis Agent. Goal: "${goal}".
 User answers:\n${qaText(qa)}
 Assess the goal. Respond with ONLY JSON:
 {"goalDifficulty":"Low|Medium|High|Very High","estimatedMonths":number,"dailyHours":number,"weeklyHours":number,"confidence":number (0-100),"skillsRequired":[strings],"risks":[strings]}`,
+    { schema: profileSchema },
   );
   return extractJson<GoalProfile>(text);
 }
@@ -204,10 +278,20 @@ function sampleRoadmap(profile: GoalProfile): RoadmapMonth[] {
   const months = Math.max(3, Math.min(profile.estimatedMonths, 12));
   return Array.from({ length: months }, (_, i) => {
     const [title, objectives] = phases[Math.min(i, phases.length - 1)];
+    // Break the month's objectives across 4 weeks so progress is trackable
+    // week by week, not just month by month.
+    const weeks: RoadmapWeek[] = Array.from({ length: 4 }, (_, w) => ({
+      week: w + 1,
+      focus:
+        objectives[w] ??
+        objectives[w % objectives.length] ??
+        "Consolidate the week's work and review your progress",
+    }));
     return {
       month: i + 1,
       title: i < phases.length ? title : `${title} ${i - phases.length + 2}`,
       objectives: [...objectives],
+      weeks,
     };
   });
 }
@@ -217,13 +301,29 @@ async function planningAgentLive(
   qa: QA[],
   profile: GoalProfile,
 ): Promise<RoadmapMonth[]> {
-  const text = await gemini(
+  const text = await llm(
     `You are the Planning Agent. Goal: "${goal}" (difficulty ${profile.goalDifficulty}, ~${profile.estimatedMonths} months, ${profile.weeklyHours}h/week).
 User answers:\n${qaText(qa)}
-Create a DETAILED monthly roadmap covering all ${Math.min(profile.estimatedMonths, 12)} months (or up to 12). Each month needs a clear theme and 4-6 specific, actionable objectives written in simple, encouraging language a beginner can understand. Respond with ONLY a JSON array:
-[{"month":1,"title":"...","objectives":["...","...","...","..."]}]`,
+Create a DETAILED roadmap covering all ${Math.min(profile.estimatedMonths, 12)} months (or up to 12). Each month needs a clear theme, 4-6 specific monthly objectives, AND a week-by-week breakdown: exactly 4 weeks, each with one concrete thing to complete that week (what to finish in week 1, week 2, week 3, week 4). Write in simple, encouraging language a beginner can understand. Respond with ONLY a JSON array:
+[{"month":1,"title":"...","objectives":["...","...","...","..."],"weeks":[{"week":1,"focus":"..."},{"week":2,"focus":"..."},{"week":3,"focus":"..."},{"week":4,"focus":"..."}]}]`,
+    { schema: roadmapSchema },
   );
-  return extractJson<RoadmapMonth[]>(text);
+  const months = extractJson<RoadmapMonth[]>(text);
+  // Guarantee every month has a 4-week breakdown even if the model skipped it.
+  return months.map((m) => {
+    const objectives = m.objectives ?? [];
+    const weeks =
+      Array.isArray(m.weeks) && m.weeks.length
+        ? m.weeks
+        : Array.from({ length: 4 }, (_, w) => ({
+            week: w + 1,
+            focus:
+              objectives[w] ??
+              objectives[w % Math.max(objectives.length, 1)] ??
+              "Consolidate the week's work and review your progress",
+          }));
+    return { ...m, objectives, weeks };
+  });
 }
 
 // 3. Timetable Agent — realistic daily schedule
@@ -261,64 +361,71 @@ function parseFocusWindow(qa: QA[]): { start: string; end: string } | null {
 
 function sampleTimetable(qa: QA[]): TimetableSlot[] {
   const focus = parseFocusWindow(qa);
+
+  const fmt = (mins: number) =>
+    `${String(Math.floor(mins / 60) % 24).padStart(2, "0")}:${String(mins % 60).padStart(2, "0")}`;
+  const toMins = (t: string) => {
+    const [h, m] = t.split(":").map(Number);
+    return h * 60 + m;
+  };
+
+  // Base day in minutes; a stated focus window replaces whatever it
+  // overlaps and the day is re-sorted so it always reads top-to-bottom.
+  let slots: { start: number; end: number; activity: string }[] = [
+    { start: 360, end: 420, activity: "Wake up, light exercise, breakfast" },
+    {
+      start: 420,
+      end: 540,
+      activity: "Deep work block — hardest task of the day",
+    },
+    { start: 540, end: 780, activity: "College / work / primary commitments" },
+    { start: 780, end: 840, activity: "Lunch + short walk" },
+    {
+      start: 840,
+      end: 960,
+      activity: "Second work block — practice and application",
+    },
+    { start: 960, end: 1020, activity: "Exercise / gym / outdoor break" },
+    {
+      start: 1020,
+      end: 1140,
+      activity: "Lighter tasks — notes, revision, reading",
+    },
+    { start: 1140, end: 1260, activity: "Dinner + family / personal time" },
+    { start: 1260, end: 1320, activity: "Review today + plan tomorrow" },
+    { start: 1320, end: 1350, activity: "Wind down and sleep" },
+  ];
+
   if (focus) {
-    return [
-      {
-        time: `Before ${focus.start}`,
-        activity: "Wake up, freshen up, water — no phone",
-      },
-      {
-        time: `${focus.start} - ${focus.end}`,
+    const fs = toMins(focus.start);
+    const fe = toMins(focus.end);
+    if (fe > fs) {
+      // carve the focus window out of any overlapping base slots
+      slots = slots.flatMap((s) => {
+        if (s.end <= fs || s.start >= fe) return [s];
+        const parts: typeof slots = [];
+        if (s.start < fs) parts.push({ ...s, end: fs });
+        if (s.end > fe) parts.push({ ...s, start: fe });
+        return parts;
+      });
+      // the user chose their own deep-work hours — drop the generic block
+      slots = slots.filter((s) => !s.activity.startsWith("Deep work block"));
+      slots.push({
+        start: fs,
+        end: fe,
         activity:
           "Deep focus block — your hardest, highest-impact work (your chosen hours)",
-      },
-      {
-        time: `After ${focus.end}`,
-        activity: "Breakfast and a short walk to reset",
-      },
-      {
-        time: "09:00 - 13:00",
-        activity: "College / work / primary commitments",
-      },
-      {
-        time: "13:00 - 14:00",
-        activity: "Lunch + 15-minute break away from screens",
-      },
-      {
-        time: "14:00 - 16:00",
-        activity: "Second work block — practice and application",
-      },
-      { time: "16:00 - 17:00", activity: "Exercise / gym / outdoor break" },
-      {
-        time: "17:00 - 19:00",
-        activity: "Lighter tasks — notes, revision, reading",
-      },
-      { time: "19:00 - 21:00", activity: "Dinner + family / personal time" },
-      { time: "21:00 - 21:30", activity: "Review today + plan tomorrow" },
-      {
-        time: "21:30",
-        activity: "Wind down and sleep — protect tomorrow's focus block",
-      },
-    ];
+      });
+      slots.sort((a, b) => a.start - b.start);
+    }
   }
-  return [
-    { time: "06:00 - 07:00", activity: "Wake up, light exercise, breakfast" },
-    {
-      time: "07:00 - 09:00",
-      activity: "Deep work block 1 — hardest task of the day",
-    },
-    { time: "09:00 - 13:00", activity: "College / work / primary commitments" },
-    { time: "13:00 - 14:00", activity: "Lunch + short walk" },
-    {
-      time: "14:00 - 16:00",
-      activity: "Deep work block 2 — practice and application",
-    },
-    { time: "16:00 - 17:00", activity: "Break / gym" },
-    { time: "17:00 - 19:00", activity: "Review, notes, and lighter tasks" },
-    { time: "19:00 - 21:00", activity: "Dinner + personal time" },
-    { time: "21:00 - 22:00", activity: "Daily review + plan tomorrow" },
-    { time: "22:00", activity: "Sleep" },
-  ];
+
+  return slots
+    .filter((s) => s.end - s.start >= 15)
+    .map((s) => ({
+      time: `${fmt(s.start)} - ${fmt(s.end)}`,
+      activity: s.activity,
+    }));
 }
 
 async function timetableAgentLive(
@@ -326,10 +433,11 @@ async function timetableAgentLive(
   qa: QA[],
   profile: GoalProfile,
 ): Promise<TimetableSlot[]> {
-  const text = await gemini(
+  const text = await llm(
     `You are the Timetable Agent. Build a realistic weekday timetable (not generic) for a user with goal "${goal}" who can invest ${profile.dailyHours}h/day, respecting their commitments and preferred timings from these answers:\n${qaText(qa)}
 IMPORTANT: if the user states specific focus/study hours (e.g. "5:30am to 7:30am"), the timetable MUST place their deep-focus block at exactly those times. If they state their wake-up and sleep times, the timetable MUST start at their wake-up time and end at their sleep time. Cover the full day from wake-up to sleep. Respond with ONLY a JSON array:
 [{"time":"06:00 - 07:00","activity":"..."}]`,
+    { schema: timetableSchema },
   );
   return extractJson<TimetableSlot[]>(text);
 }
@@ -361,10 +469,11 @@ export function habitAgent(goal: string, qa: QA[]): Promise<Habit[]> {
 }
 
 async function habitAgentLive(goal: string, qa: QA[]): Promise<Habit[]> {
-  const text = await gemini(
+  const text = await llm(
     `You are the Habit Agent. For the goal "${goal}" and this user context:\n${qaText(qa)}
 Suggest 4-6 personalized habits (not generic ones). Each habit "name" MUST be only 2-3 simple words so it's easy to read at a glance (e.g. "Mock Test", "Editorial Reading"). Respond with ONLY a JSON array:
 [{"name":"...","frequency":"daily|weekdays|weekly","why":"one sentence"}]`,
+    { schema: habitsSchema },
   );
   return extractJson<Habit[]>(text);
 }
@@ -392,7 +501,7 @@ async function coachAgentLive(
 Their habits: ${plan.habits.map((h) => h.name).join(", ")}
 Current roadmap month: ${plan.roadmap[0]?.title} — ${plan.roadmap[0]?.objectives.join("; ")}`
     : "";
-  return gemini(
+  return llm(
     `You are the Coach Agent of Ascend — a calm, direct personal coach. Today is ${today}.
 User memory:\n${memoryText(memory)}
 ${planText}
@@ -405,14 +514,16 @@ export function analyticsAgent(memory: UserMemory): Promise<string> {
   return withFallback(
     "Analytics Agent",
     () => analyticsAgentLive(memory),
-    `Your plan allocates ${memory.profile.weeklyHours} hours per week; users at this load typically dip in week 3 — schedule your lightest day mid-week to absorb it. Your listed risks (${memory.profile.risks.join("; ")}) are best countered by keeping the morning deep-work block untouchable. Demanding work placed early in the day consistently outperforms evening sessions.`,
+    `• Your plan allocates **${memory.profile.weeklyHours} hours per week** — users at this load typically dip in week 3, so schedule your lightest day mid-week to absorb it.
+• Keep your **morning deep-work block untouchable**; it's your best defense against your listed risks (${memory.profile.risks.join("; ")}).
+• Demanding work placed **early in the day** consistently outperforms evening sessions — front-load your hardest task.`,
   );
 }
 
 async function analyticsAgentLive(memory: UserMemory): Promise<string> {
-  return gemini(
+  return llm(
     `You are the Analytics Agent. Based on this user's profile, risks, and reflections:\n${memoryText(memory)}
-Write 2-3 short insights that EXPLAIN patterns and suggest concrete adjustments (e.g. when to schedule demanding work). Plain sentences, no headings. Mark the most important phrases in **bold** (double asterisks).`,
+Write exactly 3 short insights that EXPLAIN patterns and suggest concrete adjustments (e.g. when to schedule demanding work). Format each as its own bullet point starting with "• ". No headings, no intro sentence. Mark the most important phrase in each bullet in **bold** (double asterisks).`,
   );
 }
 
@@ -421,15 +532,17 @@ export function motivationAgent(memory: UserMemory): Promise<string> {
   return withFallback(
     "Motivation Agent",
     () => motivationAgentLive(memory),
-    `You are at the start of a ${memory.profile.estimatedMonths}-month plan with ${memory.profile.confidence}% estimated confidence — that confidence rises with every completed day. Protecting just your ${memory.profile.dailyHours} planned hours today keeps you exactly on schedule. Small, kept promises to yourself are what close the gap.`,
+    `• You're at the start of a **${memory.profile.estimatedMonths}-month plan** with ${memory.profile.confidence}% estimated confidence — that number climbs with every completed day.
+• Protecting just your **${memory.profile.dailyHours} planned hours today** keeps you exactly on schedule.
+• Small, kept promises to yourself are what close the gap — **consistency beats intensity**.`,
   );
 }
 
 async function motivationAgentLive(memory: UserMemory): Promise<string> {
-  return gemini(
+  return llm(
     `You are the Motivation Agent. Not quotes — real motivation grounded in the user's actual plan and numbers.
 User memory:\n${memoryText(memory)}
-Write 2-3 sentences quantifying where they stand and the small concrete adjustment that keeps them on track.`,
+Write exactly 3 bullet points (each starting with "• ") that quantify where they stand and name the small concrete adjustment that keeps them on track. Mark the key number or phrase in each bullet in **bold**.`,
   );
 }
 
@@ -453,7 +566,7 @@ async function reflectionAgentLive(
   memory: UserMemory,
   reflection: { win: string; distraction: string; lesson: string },
 ): Promise<string> {
-  return gemini(
+  return llm(
     `You are the Reflection Agent. User memory:\n${memoryText(memory)}
 This week's reflection — Win: ${reflection.win}. Distraction: ${reflection.distraction}. Lesson: ${reflection.lesson}.
 First, in 1-2 sentences, tell them what their reflection reveals about how their week actually went. Then suggest 3 specific, personalized adjustments to next week's plan as short bullet lines starting with "•". Mark key phrases in **bold** (double asterisks). Simple, encouraging language.`,
@@ -478,26 +591,35 @@ async function chatAgentLive(
   memory: UserMemory,
   plan: Plan | undefined,
   history: { role: string; text: string }[],
-  message: string,
+  _message: string,
 ): Promise<string> {
-  const recent = history
-    .slice(-10)
-    .map((m) => `${m.role === "user" ? "User" : "Coach"}: ${m.text}`)
-    .join("\n");
   const planText = plan
-    ? `Their current plan — roadmap month 1: ${plan.roadmap[0]?.title}; timetable: ${plan.timetable.map((t) => `${t.time} ${t.activity}`).join("; ")}; habits: ${plan.habits.map((h) => h.name).join(", ")}.`
+    ? `Their current plan:
+- Roadmap: ${plan.roadmap.map((m) => `Month ${m.month}: ${m.title}`).join("; ")}
+- Timetable: ${plan.timetable.map((t) => `${t.time} ${t.activity}`).join("; ")}
+- Habits: ${plan.habits.map((h) => `${h.name} (${h.frequency})`).join(", ")}`
     : "";
-  return gemini(
-    `You are the user's personal AI coach in Ascend. Be warm, direct, and practical. Answer their doubts clearly in simple language; keep replies under 150 words unless they ask for detail. Mark key phrases in **bold**.
-User memory:\n${memoryText(memory)}
-${planText}
-Recent conversation:\n${recent}
-User: ${message}
-Coach:`,
-  );
+  const system = `You are the user's personal AI coach in Ascend, a goal-execution app. Be warm, direct, and practical. Answer doubts clearly in simple language; keep replies under 150 words unless they ask for detail. Mark key phrases in **bold** (double asterisks).
+
+You have an ongoing relationship with this user — this is a continuing conversation, not a first meeting. Remember and refer back to what they told you earlier in the chat (names, numbers, decisions, struggles they mentioned). If they refer to something from before ("that", "the thing I said", "like last time"), resolve it from the conversation history. Never re-ask something they already answered; build on it.
+
+Long-term memory about the user:
+${memoryText(memory)}
+${planText}`;
+
+  // Send the real conversation as role-based turns (last 30 messages),
+  // which already ends with the user's newest message.
+  const turns: ChatTurn[] = history.slice(-30).map((m) => ({
+    role: m.role === "user" ? "user" : "model",
+    text: m.text,
+  }));
+  // The conversation must open with a user turn
+  while (turns.length && turns[0].role !== "user") turns.shift();
+  return llmChat(system, turns);
 }
 
-// Master Orchestrator — Goal → (Planning ∥ Timetable ∥ Habit) → Plan
+// Master Orchestrator — Goal → (Planning ∥ Timetable ∥ Habit) → Plan.
+// Gemini handles concurrent requests, so the three run in parallel for speed.
 export async function orchestrate(goal: string, qa: QA[]): Promise<Plan> {
   const profile = await goalAgentAnalyze(goal, qa);
   const [roadmap, timetable, habits] = await Promise.all([

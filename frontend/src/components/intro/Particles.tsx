@@ -18,7 +18,7 @@ interface Mote {
  */
 export function Particles({
   count = 42,
-  rgb = "243, 217, 139",
+  rgb = "230, 213, 184",
 }: {
   count?: number;
   rgb?: string;

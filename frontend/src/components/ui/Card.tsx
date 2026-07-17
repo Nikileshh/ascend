@@ -1,16 +1,23 @@
 export function Card({
   title,
+  action,
   children,
 }: {
   title?: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-3xl border border-black/5 bg-white p-6 shadow-xl shadow-black/5 dark:border-white/10 dark:bg-zinc-900">
-      {title && (
-        <h2 className="mb-4 text-lg font-semibold text-black dark:text-white">
-          {title}
-        </h2>
+    <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      {(title || action) && (
+        <div className="mb-4 flex items-center justify-between">
+          {title && (
+            <h2 className="text-sm font-semibold tracking-tight text-zinc-900">
+              {title}
+            </h2>
+          )}
+          {action}
+        </div>
       )}
       {children}
     </section>

@@ -2,9 +2,13 @@
 
 import { useState } from "react";
 import { api } from "@/lib/api";
-import { Card } from "@/components/ui/Card";
+import {
+  GlassCard,
+  CoachBadge,
+  buttonAccent,
+  inputDark,
+} from "@/components/ui/Glass";
 import { RichText } from "@/components/ui/RichText";
-import { buttonClass, inputClass } from "@/components/ui/AuthCard";
 
 export default function ReflectionPage() {
   const [reflection, setReflection] = useState({
@@ -33,35 +37,32 @@ export default function ReflectionPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight text-black dark:text-white">
+    <main className="mx-auto max-w-[720px] px-5 py-10 sm:px-8 sm:py-14 md:px-12">
+      <h1 className="font-display text-[32px] leading-tight font-medium tracking-tight text-[#1f1a14] sm:text-[42px]">
         Weekly reflection
       </h1>
-      <Card>
+      <p className="mt-2 text-[16px] text-[#6b6155]">
+        Write freely — your coach reads this and adjusts next week&apos;s plan
+        for you.
+      </p>
+
+      <GlassCard className="mt-6">
         {adjustments ? (
           <div>
-            <p className="text-sm font-medium text-black dark:text-white">
-              Your AI coach suggests for next week:
-            </p>
-            <div className="mt-2">
-              <RichText text={adjustments} />
-            </div>
+            <CoachBadge caption="Suggestions for next week" />
+            <RichText text={adjustments} />
             <button
               onClick={() => {
                 setAdjustments("");
                 setReflection({ win: "", distraction: "", lesson: "" });
               }}
-              className="mt-4 text-sm text-blue-600 dark:text-blue-400"
+              className="mt-4 text-[13px] font-medium text-[#7d5a1e] hover:underline"
             >
               Write another reflection
             </button>
           </div>
         ) : (
-          <form onSubmit={submit} className="space-y-4">
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Write freely — your AI coach reads this and adjusts next
-              week&apos;s plan for you.
-            </p>
+          <form onSubmit={submit} className="flex flex-col gap-5">
             {(
               [
                 ["win", "What was your biggest win this week?"],
@@ -70,28 +71,32 @@ export default function ReflectionPage() {
               ] as const
             ).map(([key, label]) => (
               <div key={key}>
-                <label className="mb-1 block text-sm font-medium text-black dark:text-white">
+                <label className="mb-2 block text-[13.5px] font-medium text-[#1f1a14]">
                   {label}
                 </label>
                 <textarea
                   required
-                  rows={4}
+                  rows={3}
                   placeholder="Take your time — the more honest you are, the better the suggestions."
                   value={reflection[key]}
                   onChange={(e) =>
                     setReflection({ ...reflection, [key]: e.target.value })
                   }
-                  className={inputClass}
+                  className={`${inputDark} resize-y leading-5`}
                 />
               </div>
             ))}
-            {error && <p className="text-sm text-red-500">{error}</p>}
-            <button type="submit" disabled={loading} className={buttonClass}>
+            {error && <p className="text-sm text-[#b5551f]">{error}</p>}
+            <button
+              type="submit"
+              disabled={loading}
+              className={`${buttonAccent} self-start`}
+            >
               {loading ? "Reflecting…" : "Submit reflection"}
             </button>
           </form>
         )}
-      </Card>
-    </div>
+      </GlassCard>
+    </main>
   );
 }

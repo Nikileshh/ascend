@@ -28,7 +28,7 @@ export function HabitTracker({
 
   async function toggle(date: string, habit: string) {
     const current = log[date]?.[habit];
-    // click cycles: empty → done (green) → missed (red) → empty
+    // click cycles: empty → done (accent) → missed (rose) → empty
     const next: "done" | "missed" | "clear" =
       current === "done" ? "missed" : current === "missed" ? "clear" : "done";
     const optimistic = structuredClone(log);
@@ -53,16 +53,16 @@ export function HabitTracker({
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-4">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 text-lg font-semibold text-white">
+      <div className="mb-6 flex items-center gap-4">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-[#a8721f]/30 bg-[#a8721f]/12 text-base font-semibold text-[#7d5a1e] shadow-[0_2px_12px_rgba(168,114,31,0.18)]">
           {todayScore}%
         </div>
         <div>
-          <p className="text-sm font-medium text-black dark:text-white">
+          <p className="text-sm font-semibold text-[#1f1a14]">
             Today&apos;s productivity score
           </p>
-          <p className="text-xs text-zinc-500">
-            Click a cell to mark a habit: green = done, red = missed, click
+          <p className="mt-1 text-xs text-[#6b6155]">
+            Click a cell to mark a habit — gold = done, red = missed, click
             again to clear.
           </p>
         </div>
@@ -72,13 +72,13 @@ export function HabitTracker({
         <table className="w-full border-separate border-spacing-1 text-xs">
           <thead>
             <tr>
-              <th className="min-w-40 text-left font-medium text-zinc-500">
+              <th className="min-w-24 text-left font-medium text-[#9a8f80] sm:min-w-40">
                 Habit
               </th>
               {days.map((d) => (
                 <th
                   key={d}
-                  className={`px-1 text-center font-normal ${d === today ? "font-semibold text-blue-600 dark:text-blue-400" : "text-zinc-400"}`}
+                  className={`px-1 text-center font-mono text-[10px] ${d === today ? "font-semibold text-[#7d5a1e]" : "font-normal text-[#9a8f80]"}`}
                 >
                   <span className="block">
                     {new Date(d).toLocaleDateString("en", { month: "short" })}
@@ -91,7 +91,7 @@ export function HabitTracker({
           <tbody>
             {habits.map((habit) => (
               <tr key={habit}>
-                <td className="pr-2 text-zinc-700 dark:text-zinc-300">
+                <td className="max-w-28 pr-2 leading-tight text-[#4a4239] sm:max-w-none">
                   {habit}
                 </td>
                 {days.map((d) => {
@@ -101,12 +101,12 @@ export function HabitTracker({
                       <button
                         aria-label={`${habit} on ${d}: ${status ?? "not marked"}`}
                         onClick={() => toggle(d, habit)}
-                        className={`h-7 w-7 rounded-md border transition-colors ${
+                        className={`h-[26px] w-[26px] rounded-lg border transition-all hover:scale-110 active:scale-90 ${
                           status === "done"
-                            ? "border-green-600 bg-green-500"
+                            ? "border-[#a8721f] bg-[#a8721f] shadow-[0_0_10px_rgba(168,114,31,0.3)]"
                             : status === "missed"
-                              ? "border-red-600 bg-red-500"
-                              : "border-black/10 bg-zinc-100 hover:bg-zinc-200 dark:border-white/10 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+                              ? "border-[#DC2626] bg-[#DC2626]"
+                              : "border-[#1f1a14]/10 bg-[#1f1a14]/[0.03] hover:bg-[#1f1a14]/[0.06]"
                         }`}
                       />
                     </td>
@@ -115,7 +115,7 @@ export function HabitTracker({
               </tr>
             ))}
             <tr>
-              <td className="pt-2 pr-2 font-medium text-zinc-500">
+              <td className="pt-2 pr-2 font-medium text-[#9a8f80]">
                 Daily score
               </td>
               {days.map((d) => {
@@ -123,12 +123,12 @@ export function HabitTracker({
                 return (
                   <td
                     key={d}
-                    className={`pt-2 text-center font-medium ${
+                    className={`pt-2 text-center font-mono text-[10px] font-semibold ${
                       score >= 70
-                        ? "text-green-600 dark:text-green-400"
+                        ? "text-[#10B981]"
                         : score > 0
-                          ? "text-amber-600 dark:text-amber-400"
-                          : "text-zinc-400"
+                          ? "text-[#F59E0B]"
+                          : "text-[#c9bfae]"
                     }`}
                   >
                     {score}%

@@ -128,7 +128,7 @@ export function AscendIntro({
         className="relative h-[100svh] w-full overflow-hidden"
         style={{ background: c.night, ...vars }}
       >
-        <Background />
+        <Background image={config.backgroundImage} />
         <Logo title={config.logo.title} tagline={config.logo.tagline} />
       </section>
     );
@@ -149,7 +149,7 @@ export function AscendIntro({
         className="intro-overlay pointer-events-none fixed inset-0 z-[60] overflow-hidden"
         style={{ background: c.night, willChange: "opacity" }}
       >
-        <Background />
+        <Background image={config.backgroundImage} />
         <Particles />
 
         <div
@@ -163,7 +163,7 @@ export function AscendIntro({
 
         <div
           className="intro-cue absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-xs tracking-[0.3em] uppercase"
-          style={{ color: "rgba(243, 217, 139, 0.65)" }}
+          style={{ color: "rgba(230, 213, 184, 0.75)" }}
         >
           <span className="flex flex-col items-center gap-2">
             Scroll
