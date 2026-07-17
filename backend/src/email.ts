@@ -254,6 +254,7 @@ export function sendLoginAlert(user: User) {
   const when = new Date().toLocaleString("en-IN", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "Asia/Kolkata", // cloud hosts run in UTC
   });
   notify(
     user.email,

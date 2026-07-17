@@ -31,7 +31,9 @@ export default function OverviewPage() {
   // The user's clicks this session, layered over the server's habit log.
   const [touched, setTouched] = useState<Record<string, "done" | "clear">>({});
 
-  const todayKey = new Date().toISOString().slice(0, 10);
+  // en-CA formats as YYYY-MM-DD in the user's own timezone (UTC would put
+  // 00:00–05:30 IST on yesterday's date)
+  const todayKey = new Date().toLocaleDateString("en-CA");
 
   // Greeting and date are client-only values (clock + localStorage), derived
   // at render once hydration completes.

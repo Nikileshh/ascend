@@ -355,7 +355,7 @@ app.get("/agents/briefing", requireAuth, async (req: AuthedRequest, res) => {
     return res
       .status(404)
       .json({ error: "No plan yet. Run onboarding first." });
-  const today = new Date().toISOString().slice(0, 10);
+  const today = istNow().date;
   if (user.briefingCache?.date === today)
     return res.json({ coach: user.briefingCache.text });
   try {
@@ -374,7 +374,7 @@ app.get("/agents/insights", requireAuth, async (req: AuthedRequest, res) => {
     return res
       .status(404)
       .json({ error: "No plan yet. Run onboarding first." });
-  const today = new Date().toISOString().slice(0, 10);
+  const today = istNow().date;
   if (user.insightsCache?.date === today)
     return res.json({
       analytics: user.insightsCache.analytics,
@@ -678,7 +678,7 @@ app.post(
 app.get("/admin/analytics", requireAuth, requireAdmin, (_req, res) => {
   const users = allUsers();
   const activity = allActivity();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = istNow().date;
 
   const lastActive: Record<string, string> = {};
   const counts: Record<string, number> = {};
@@ -686,11 +686,11 @@ app.get("/admin/analytics", requireAuth, requireAdmin, (_req, res) => {
   for (const a of activity) {
     counts[a.type] = (counts[a.type] ?? 0) + 1;
     if (a.email) lastActive[a.email] = a.at;
-    if (a.type === "visit" && a.at.slice(0, 10) === today) visitsToday++;
+    if (a.type === "visit" && istDate(a.at) === today) visitsToday++;
   }
   const activeToday = new Set(
     activity
-      .filter((a) => a.at.slice(0, 10) === today && a.email)
+      .filter((a) => istDate(a.at) === today && a.email)
       .map((a) => a.email),
   ).size;
 
@@ -722,13 +722,29 @@ app.get("/admin/analytics", requireAuth, requireAdmin, (_req, res) => {
   });
 });
 
+// Users are in India and timetables are written in IST, but cloud hosts run
+// in UTC — so all schedule checks convert to IST explicitly.
+function istDate(iso: string) {
+  return new Date(new Date(iso).getTime() + 5.5 * 3_600_000)
+    .toISOString()
+    .slice(0, 10);
+}
+function istNow() {
+  const ist = new Date(Date.now() + 5.5 * 3_600_000);
+  return {
+    date: ist.toISOString().slice(0, 10),
+    hours: ist.getUTCHours(),
+    hhmm: `${String(ist.getUTCHours()).padStart(2, "0")}:${String(ist.getUTCMinutes()).padStart(2, "0")}`,
+  };
+}
+
 // --- Daily morning briefing: email each user their tasks for the day ---
 let lastBriefingDate = "";
 setInterval(
   () => {
-    const now = new Date();
-    const today = now.toISOString().slice(0, 10);
-    if (now.getHours() === 6 && lastBriefingDate !== today) {
+    const now = istNow();
+    const today = now.date;
+    if (now.hours === 6 && lastBriefingDate !== today) {
       lastBriefingDate = today;
       const recipients = allUsers().filter(
         (u) => u.plan && u.verified !== false && u.role === "user",
@@ -745,15 +761,13 @@ setInterval(
 const taskSent = new Set<string>();
 let taskSweepDay = "";
 setInterval(() => {
-  const now = new Date();
-  const today = now.toISOString().slice(0, 10);
+  const now = istNow();
+  const today = now.date;
   if (today !== taskSweepDay) {
     taskSent.clear(); // new day → allow every slot to fire again
     taskSweepDay = today;
   }
-  const hh = String(now.getHours()).padStart(2, "0");
-  const mm = String(now.getMinutes()).padStart(2, "0");
-  const nowHHMM = `${hh}:${mm}`;
+  const nowHHMM = now.hhmm;
 
   for (const u of allUsers()) {
     if (!u.plan || u.verified === false || u.role !== "user") continue;

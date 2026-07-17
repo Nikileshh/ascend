@@ -11,7 +11,7 @@ function trackedDays(n: number): string[] {
   return Array.from({ length: n }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i);
-    return d.toISOString().slice(0, 10);
+    return d.toLocaleDateString("en-CA"); // YYYY-MM-DD in the user's timezone
   });
 }
 
