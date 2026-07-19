@@ -57,6 +57,8 @@ export interface User {
   resetExpires?: string;
   plan?: Plan;
   memory?: UserMemory;
+  // Dashboard modules the user opted into at onboarding (absent = all).
+  modules?: string[];
   // one AI call per day per section — cached to conserve API quota
   briefingCache?: { date: string; text: string };
   insightsCache?: { date: string; analytics: string; motivation: string };

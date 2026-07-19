@@ -10,32 +10,43 @@ const tabs = [
   {
     href: "/dashboard",
     label: "Overview",
+    module: null, // always visible
     icon: "M3 9.5 12 3l9 6.5V21H3V9.5z",
   },
   {
     href: "/dashboard/roadmap",
     label: "Roadmap",
+    module: "roadmap",
     icon: "M9 20l-5.5-2V4L9 6m0 14 6-2m-6 2V6m6 12 5.5 2V6L15 4m0 14V4M9 6l6-2",
   },
   {
     href: "/dashboard/timetable",
     label: "Timetable",
+    module: "timetable",
     icon: "M12 8v4l2.5 2.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z",
   },
-  { href: "/dashboard/habits", label: "Habits", icon: "M5 13l4 4L19 7" },
+  {
+    href: "/dashboard/habits",
+    label: "Habits",
+    module: "habits",
+    icon: "M5 13l4 4L19 7",
+  },
   {
     href: "/dashboard/insights",
     label: "Insights",
+    module: "insights",
     icon: "M4 19v-5m5.5 5V9M15 19v-8m5 8V5",
   },
   {
     href: "/dashboard/reflection",
     label: "Reflection",
+    module: "reflection",
     icon: "M11 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-5m-1.4-9.4a2 2 0 1 1 2.8 2.8L11 15l-4 1 1-4 8.6-8.4z",
   },
   {
     href: "/dashboard/chat",
     label: "AI Chat",
+    module: "chat",
     icon: "M8 10h8m-8 4h5m8-2a9 9 0 0 1-13.2 8L3 21l1-4.8A9 9 0 1 1 21 12z",
   },
 ];
@@ -143,7 +154,12 @@ export default function DashboardLayout({
     return () => clearInterval(id);
   }, []);
 
-  const nav = tabs.map((t) => {
+  // Show only the modules the user opted into (absent = all, e.g. old accounts)
+  const visibleTabs = tabs.filter(
+    (t) => !t.module || !user?.modules || user.modules.includes(t.module),
+  );
+
+  const nav = visibleTabs.map((t) => {
     const active = pathname === t.href;
     return (
       <Link
@@ -164,7 +180,8 @@ export default function DashboardLayout({
   });
 
   return (
-    <div className="relative flex min-h-screen overflow-hidden bg-[#f4efe6] text-[#1f1a14]">
+    // no overflow-hidden on this wrapper — it would break the sticky sidebar
+    <div className="relative flex min-h-screen bg-[#f4efe6] text-[#1f1a14]">
       {/* Ambient backdrop — macOS-wallpaper feel: the photo drifts softly but a
           near-opaque white wash keeps it barely perceptible, only at the edges,
           never under text. The dashboard stays the visual focus. */}
@@ -275,7 +292,7 @@ export default function DashboardLayout({
             </button>
           </div>
           <nav className="flex gap-1 overflow-x-auto px-3 pb-2">
-            {tabs.map((t) => (
+            {visibleTabs.map((t) => (
               <Link
                 key={t.href}
                 href={t.href}

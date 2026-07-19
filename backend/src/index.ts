@@ -292,10 +292,27 @@ app.post(
         error: `Free trial is limited to ${TRIAL_ANALYSIS_LIMIT} goal analyses. Subscribe to the Ascend plan (₹250/month) for unlimited analyses.`,
       });
 
+    // Which dashboard modules the user opted into (absent/empty = all).
+    const KNOWN_MODULES = [
+      "roadmap",
+      "timetable",
+      "habits",
+      "insights",
+      "reflection",
+      "chat",
+    ];
+    const modules = Array.isArray(req.body?.modules)
+      ? (req.body.modules as unknown[]).filter(
+          (m): m is string =>
+            typeof m === "string" && KNOWN_MODULES.includes(m),
+        )
+      : null;
+
     try {
       const plan = await orchestrate(goal, qa);
       user.plan = plan;
       user.memory = { goal, qa, profile: plan.profile, reflections: [] };
+      if (modules) user.modules = modules.length ? modules : KNOWN_MODULES;
       user.analysisCount += 1;
       delete user.briefingCache; // new plan → fresh briefing/insights
       delete user.insightsCache;
@@ -771,6 +788,7 @@ setInterval(() => {
 
   for (const u of allUsers()) {
     if (!u.plan || u.verified === false || u.role !== "user") continue;
+    if (u.modules && !u.modules.includes("timetable")) continue; // opted out
     for (const slot of u.plan.timetable) {
       const m = slot.time.match(/^(\d{1,2}):(\d{2})/);
       if (!m) continue;

@@ -12,6 +12,8 @@ export interface SessionUser {
   daysLeft: number;
   premium?: boolean;
   premiumSince?: string;
+  // Dashboard modules chosen at onboarding (absent = all)
+  modules?: string[];
 }
 
 export function getToken() {

@@ -80,7 +80,18 @@ async function withFallback<T>(
 // JSON Schemas for structured (Ollama-constrained) outputs — one per agent
 // that must return machine-readable data. These guarantee the exact shape.
 const strings = { type: "array", items: { type: "string" } } as const;
-const questionsSchema = strings;
+const questionsSchema = {
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      question: { type: "string" },
+      type: { type: "string", enum: ["choice", "time"] },
+      options: strings,
+    },
+    required: ["question", "type", "options"],
+  },
+} as const;
 const profileSchema = {
   type: "object",
   properties: {
@@ -154,28 +165,138 @@ Onboarding answers:\n${qaText(m.qa)}
 Recent reflections: ${JSON.stringify(m.reflections.slice(-3))}`;
 }
 
-// 1. Goal Agent — follow-up questions tailored to the goal
-export function goalAgentQuestions(goal: string): Promise<string[]> {
+// 1. Goal Agent — follow-up questions tailored to the goal, each with
+// tap-to-select options ("time" questions get a clock-time grid in the UI;
+// the frontend appends an "Other" free-text option to every question).
+export interface OnboardingQuestion {
+  question: string;
+  type: "choice" | "time";
+  options: string[];
+}
+
+const WAKE_TIMES = [
+  "4:30 AM",
+  "5:00 AM",
+  "5:30 AM",
+  "6:00 AM",
+  "6:30 AM",
+  "7:00 AM",
+  "7:30 AM",
+  "8:00 AM",
+  "8:30 AM",
+  "9:00 AM",
+  "9:30 AM",
+  "10:00 AM",
+];
+const SLEEP_TIMES = [
+  "9:00 PM",
+  "9:30 PM",
+  "10:00 PM",
+  "10:30 PM",
+  "11:00 PM",
+  "11:30 PM",
+  "12:00 AM",
+  "12:30 AM",
+  "1:00 AM",
+  "1:30 AM",
+  "2:00 AM",
+  "2:30 AM",
+];
+
+export function goalAgentQuestions(
+  goal: string,
+): Promise<OnboardingQuestion[]> {
   return withFallback("Goal Agent", () => goalAgentQuestionsLive(goal), [
-    `What is your current level of preparation or experience toward "${goal}"?`,
-    "What is your target deadline or timeline?",
-    "How many hours per day can you realistically invest?",
-    "What time do you usually wake up, and what time do you go to sleep?",
-    "What do you consider your weakest area for this goal?",
-    "What other commitments (work, college, family) shape your day?",
-    "When during the day do you focus best?",
+    {
+      question: `What is your current level of preparation or experience toward "${goal}"?`,
+      type: "choice",
+      options: [
+        "Complete beginner — starting from zero",
+        "Know the basics — learned informally",
+        "Intermediate — prepared before, need structure",
+        "Advanced — polishing and consistency",
+      ],
+    },
+    {
+      question: "What is your target deadline or timeline?",
+      type: "choice",
+      options: [
+        "3 months",
+        "6 months",
+        "1 year",
+        "2 years",
+        "No fixed deadline",
+      ],
+    },
+    {
+      question: "How many hours per day can you realistically invest?",
+      type: "choice",
+      options: ["1–2 hours", "3–4 hours", "5–6 hours", "7+ hours"],
+    },
+    {
+      question: "What time do you usually wake up?",
+      type: "time",
+      options: WAKE_TIMES,
+    },
+    {
+      question: "What time do you usually go to sleep?",
+      type: "time",
+      options: SLEEP_TIMES,
+    },
+    {
+      question: "What do you consider your weakest area for this goal?",
+      type: "choice",
+      options: [
+        "Staying consistent",
+        "Core concepts and fundamentals",
+        "Time management",
+        "Practice and test performance",
+        "Motivation and focus",
+      ],
+    },
+    {
+      question: "What other commitments shape your day?",
+      type: "choice",
+      options: [
+        "Full-time job",
+        "College / school",
+        "Part-time work or freelancing",
+        "Family responsibilities",
+        "Mostly free right now",
+      ],
+    },
+    {
+      question: "When during the day do you focus best?",
+      type: "choice",
+      options: [
+        "Early morning",
+        "Late morning",
+        "Afternoon",
+        "Evening",
+        "Late night",
+      ],
+    },
   ]);
 }
 
-async function goalAgentQuestionsLive(goal: string): Promise<string[]> {
+async function goalAgentQuestionsLive(
+  goal: string,
+): Promise<OnboardingQuestion[]> {
   const text = await llm(
     `You are the Goal Analysis Agent of Ascend, a personal AI coaching app.
 A user has this goal: "${goal}".
-Ask exactly 7 short, intelligent follow-up questions to understand: their current level/situation, deadline or target attempt, available hours per day, their usual wake-up time AND sleep time (one question asking both — needed to build their timetable), weakest area, other commitments (work/college), and preferred working/study timings — all tailored to this specific goal.
-Respond with ONLY a JSON array of 7 strings.`,
+Create exactly 8 short onboarding questions, each with tap-to-select answer options, covering in order: 1) current level/experience, 2) target deadline or attempt, 3) hours available per day, 4) usual wake-up time, 5) usual sleep time, 6) weakest area for this goal, 7) other commitments (work/college/family), 8) when they focus best. Tailor the wording and the options to this specific goal.
+Each item: "question" (short), "type" ("time" for the wake-up and sleep questions, otherwise "choice"), "options" (4-6 short, realistic, mutually exclusive answers relevant to that question — for "time" questions give exactly these 12 clock times: wake-up ${JSON.stringify(WAKE_TIMES)}, sleep ${JSON.stringify(SLEEP_TIMES)}). Never include an "Other" option — the app adds one automatically.
+Respond with ONLY a JSON array of 8 objects {question, type, options}.`,
     { schema: questionsSchema },
   );
-  return extractJson<string[]>(text);
+  const parsed = extractJson<OnboardingQuestion[]>(text);
+  // Guard against a model that ignores the shape.
+  return parsed
+    .filter(
+      (q) => q?.question && Array.isArray(q.options) && q.options.length >= 2,
+    )
+    .map((q) => ({ ...q, type: q.type === "time" ? "time" : "choice" }));
 }
 
 // 1b. Goal Agent — difficulty/timeline analysis

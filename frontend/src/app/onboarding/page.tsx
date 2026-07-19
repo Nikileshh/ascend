@@ -9,12 +9,62 @@ import {
   inputDark,
 } from "@/components/ui/Glass";
 
+interface Question {
+  question: string;
+  type: "choice" | "time";
+  options: string[];
+}
+
+const OTHER = "__other__";
+
+const MODULES = [
+  {
+    key: "roadmap",
+    name: "Roadmap",
+    desc: "Month-by-month milestones toward the goal",
+    icon: "🗺",
+  },
+  {
+    key: "timetable",
+    name: "Timetable",
+    desc: "A daily schedule with task-start reminders",
+    icon: "⏰",
+  },
+  {
+    key: "habits",
+    name: "Habits",
+    desc: "Daily habit tracker with streaks",
+    icon: "✓",
+  },
+  {
+    key: "insights",
+    name: "Insights",
+    desc: "AI analytics on your progress",
+    icon: "📊",
+  },
+  {
+    key: "reflection",
+    name: "Reflection",
+    desc: "Weekly review — your coach adjusts the plan",
+    icon: "✍️",
+  },
+  {
+    key: "chat",
+    name: "AI Chat",
+    desc: "Ask your coach anything, anytime",
+    icon: "💬",
+  },
+];
+
 export default function OnboardingPage() {
   const router = useRouter();
   const [goal, setGoal] = useState("");
-  const [questions, setQuestions] = useState<string[]>([]);
-  const [answers, setAnswers] = useState<string[]>([]);
-  const [step, setStep] = useState(0); // 0 = goal, 1..n = questions
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [selected, setSelected] = useState<string[]>([]); // option or OTHER
+  const [otherText, setOtherText] = useState<string[]>([]);
+  const [modules, setModules] = useState<string[]>(MODULES.map((m) => m.key));
+  // 0 = goal · 1..n = questions · n+1 = module picker
+  const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -22,17 +72,26 @@ export default function OnboardingPage() {
     if (!getUser()) router.replace("/login");
   }, [router]);
 
+  const modulesStep = questions.length + 1;
+
+  function answerOf(i: number) {
+    return selected[i] === OTHER
+      ? (otherText[i] ?? "").trim()
+      : (selected[i] ?? "");
+  }
+
   async function submitGoal(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      const { questions } = await api<{ questions: string[] }>(
+      const { questions } = await api<{ questions: Question[] }>(
         "/agents/questions",
         { body: { goal } },
       );
       setQuestions(questions);
-      setAnswers(Array(questions.length).fill(""));
+      setSelected(Array(questions.length).fill(""));
+      setOtherText(Array(questions.length).fill(""));
       setStep(1);
     } catch (err) {
       setError((err as Error).message);
@@ -41,37 +100,39 @@ export default function OnboardingPage() {
     }
   }
 
-  async function next(e: React.FormEvent) {
-    e.preventDefault();
-    if (step < questions.length) {
-      setStep(step + 1);
-      return;
-    }
+  async function buildPlan() {
     setError("");
     setLoading(true);
     try {
       await api("/agents/orchestrate", {
         body: {
           goal,
-          qa: questions.map((question, i) => ({
-            question,
-            answer: answers[i],
+          qa: questions.map((q, i) => ({
+            question: q.question,
+            answer: answerOf(i),
           })),
+          modules,
         },
       });
       router.push("/dashboard");
     } catch (err) {
       setError((err as Error).message);
-    } finally {
       setLoading(false);
     }
   }
 
+  function toggleModule(key: string) {
+    setModules((m) =>
+      m.includes(key) ? m.filter((k) => k !== key) : [...m, key],
+    );
+  }
+
   const current = step - 1;
-  const building = loading && step === questions.length && step > 0;
+  const q = questions[current];
+  const building = loading && step === modulesStep;
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f4efe6] px-6 text-[#1f1a14]">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f4efe6] px-6 py-10 text-[#1f1a14]">
       {/* ambient warm wash */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="animate-blob absolute -top-44 left-[20%] h-[560px] w-[560px] rounded-full bg-[#a8721f]/[0.08] blur-[80px]" />
@@ -102,7 +163,8 @@ export default function OnboardingPage() {
               What do you want to achieve?
             </h1>
             <p className="mt-1.5 text-sm leading-6 text-[#6b6155]">
-              Your AI coach will ask a few questions tailored to your goal.
+              Your AI coach will ask a few questions tailored to your goal —
+              most are one tap to answer.
             </p>
             <textarea
               required
@@ -121,8 +183,8 @@ export default function OnboardingPage() {
               {loading ? "Thinking…" : "Continue"}
             </button>
           </form>
-        ) : (
-          <form onSubmit={next} key={step} className="animate-fade-up">
+        ) : step <= questions.length ? (
+          <div key={step} className="animate-fade-up">
             <div className="flex items-center justify-between">
               <p className="font-mono text-xs font-medium tracking-[0.14em] text-[#a8721f] uppercase">
                 Question {step} of {questions.length}
@@ -138,20 +200,78 @@ export default function OnboardingPage() {
                 ))}
               </div>
             </div>
-            <h1 className="font-display mt-3 text-[28px] leading-snug font-medium text-[#1f1a14]">
-              {questions[current]}
+            <h1 className="font-display mt-3 text-[26px] leading-snug font-medium text-[#1f1a14]">
+              {q.question}
             </h1>
-            <textarea
-              required
-              rows={3}
-              value={answers[current]}
-              onChange={(e) => {
-                const copy = [...answers];
-                copy[current] = e.target.value;
-                setAnswers(copy);
-              }}
-              className={`mt-6 ${inputDark} resize-y leading-6`}
-            />
+
+            {/* Options — a compact clock grid for time questions, stacked
+                pills for everything else, plus "Other" for a custom answer. */}
+            <div
+              className={`mt-6 ${
+                q.type === "time"
+                  ? "grid grid-cols-3 gap-2 sm:grid-cols-4"
+                  : "flex flex-col gap-2"
+              }`}
+            >
+              {q.options.map((opt) => {
+                const active = selected[current] === opt;
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => {
+                      const copy = [...selected];
+                      copy[current] = opt;
+                      setSelected(copy);
+                    }}
+                    className={`rounded-xl border px-4 text-left text-[14px] transition-all duration-150 ${
+                      q.type === "time"
+                        ? "py-2.5 text-center font-mono text-[13px]"
+                        : "py-3"
+                    } ${
+                      active
+                        ? "border-[#a8721f] bg-[#a8721f]/10 font-medium text-[#7d5a1e] shadow-[0_0_0_1px_#a8721f]"
+                        : "border-[#1f1a14]/[0.12] bg-white text-[#4a4239] hover:border-[#a8721f]/50 hover:bg-[#faf6ee]"
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => {
+                  const copy = [...selected];
+                  copy[current] = OTHER;
+                  setSelected(copy);
+                }}
+                className={`rounded-xl border px-4 text-left text-[14px] transition-all duration-150 ${
+                  q.type === "time" ? "py-2.5 text-center" : "py-3"
+                } ${
+                  selected[current] === OTHER
+                    ? "border-[#a8721f] bg-[#a8721f]/10 font-medium text-[#7d5a1e] shadow-[0_0_0_1px_#a8721f]"
+                    : "border-dashed border-[#1f1a14]/20 bg-transparent text-[#6b6155] hover:border-[#a8721f]/50"
+                }`}
+              >
+                Other…
+              </button>
+            </div>
+
+            {selected[current] === OTHER && (
+              <textarea
+                autoFocus
+                rows={2}
+                placeholder="Type your answer…"
+                value={otherText[current] ?? ""}
+                onChange={(e) => {
+                  const copy = [...otherText];
+                  copy[current] = e.target.value;
+                  setOtherText(copy);
+                }}
+                className={`mt-3 ${inputDark} resize-y leading-6`}
+              />
+            )}
+
             {error && <p className="mt-3 text-sm text-[#b5551f]">{error}</p>}
             <div className="mt-6 flex gap-3">
               {step > 1 && (
@@ -163,11 +283,85 @@ export default function OnboardingPage() {
                   Back
                 </button>
               )}
-              <button type="submit" disabled={loading} className={buttonAccent}>
-                {step === questions.length ? "Build my plan" : "Next"}
+              <button
+                type="button"
+                disabled={!answerOf(current)}
+                onClick={() => setStep(step + 1)}
+                className={`${buttonAccent} disabled:cursor-not-allowed`}
+              >
+                Next
               </button>
             </div>
-          </form>
+          </div>
+        ) : (
+          <div className="animate-fade-up">
+            <p className="font-mono text-xs font-medium tracking-[0.14em] text-[#a8721f] uppercase">
+              Last step
+            </p>
+            <h1 className="font-display mt-3 text-[28px] leading-snug font-medium text-[#1f1a14]">
+              Which modules do you want?
+            </h1>
+            <p className="mt-1.5 text-sm leading-6 text-[#6b6155]">
+              Your dashboard shows only what you pick — the Overview is always
+              included. You can start a new goal anytime to change these.
+            </p>
+
+            <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
+              {MODULES.map((m) => {
+                const on = modules.includes(m.key);
+                return (
+                  <button
+                    key={m.key}
+                    type="button"
+                    onClick={() => toggleModule(m.key)}
+                    aria-pressed={on}
+                    className={`flex items-start gap-3 rounded-xl border p-3.5 text-left transition-all duration-150 ${
+                      on
+                        ? "border-[#a8721f] bg-[#a8721f]/[0.07] shadow-[0_0_0_1px_#a8721f]"
+                        : "border-[#1f1a14]/[0.12] bg-white opacity-70 hover:opacity-100"
+                    }`}
+                  >
+                    <span
+                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-[11px] ${
+                        on
+                          ? "border-[#a8721f] bg-[#a8721f] text-white"
+                          : "border-[#1f1a14]/20 bg-white text-transparent"
+                      }`}
+                    >
+                      ✓
+                    </span>
+                    <span>
+                      <span className="block text-[14px] font-semibold text-[#1f1a14]">
+                        {m.icon} {m.name}
+                      </span>
+                      <span className="mt-0.5 block text-[12.5px] leading-5 text-[#6b6155]">
+                        {m.desc}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {error && <p className="mt-3 text-sm text-[#b5551f]">{error}</p>}
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setStep(step - 1)}
+                className={buttonGhostDark}
+              >
+                Back
+              </button>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={buildPlan}
+                className={buttonAccent}
+              >
+                Build my plan
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </main>
