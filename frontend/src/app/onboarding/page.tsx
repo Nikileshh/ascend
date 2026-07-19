@@ -13,6 +13,7 @@ interface Question {
   question: string;
   type: "choice" | "time";
   options: string[];
+  multi?: boolean; // several options can apply — toggle instead of replace
 }
 
 const OTHER = "__other__";
@@ -60,7 +61,8 @@ export default function OnboardingPage() {
   const router = useRouter();
   const [goal, setGoal] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [selected, setSelected] = useState<string[]>([]); // option or OTHER
+  // Per question: chosen options (single-choice holds at most one + OTHER)
+  const [selected, setSelected] = useState<string[][]>([]);
   const [otherText, setOtherText] = useState<string[]>([]);
   const [modules, setModules] = useState<string[]>(MODULES.map((m) => m.key));
   // 0 = goal · 1..n = questions · n+1 = module picker
@@ -75,9 +77,23 @@ export default function OnboardingPage() {
   const modulesStep = questions.length + 1;
 
   function answerOf(i: number) {
-    return selected[i] === OTHER
-      ? (otherText[i] ?? "").trim()
-      : (selected[i] ?? "");
+    const picks = (selected[i] ?? []).filter((s) => s !== OTHER);
+    if ((selected[i] ?? []).includes(OTHER) && (otherText[i] ?? "").trim())
+      picks.push((otherText[i] ?? "").trim());
+    return picks.join(", ");
+  }
+
+  function pick(i: number, opt: string, multi: boolean) {
+    setSelected((prev) => {
+      const copy = [...prev];
+      const cur = copy[i] ?? [];
+      if (cur.includes(opt))
+        copy[i] = cur.filter((o) => o !== opt); // tap again → unselect
+      else if (multi)
+        copy[i] = [...cur, opt]; // stack selections
+      else copy[i] = [opt]; // single choice replaces
+      return copy;
+    });
   }
 
   async function submitGoal(e: React.FormEvent) {
@@ -90,7 +106,7 @@ export default function OnboardingPage() {
         { body: { goal } },
       );
       setQuestions(questions);
-      setSelected(Array(questions.length).fill(""));
+      setSelected(questions.map(() => []));
       setOtherText(Array(questions.length).fill(""));
       setStep(1);
     } catch (err) {
@@ -203,6 +219,11 @@ export default function OnboardingPage() {
             <h1 className="font-display mt-3 text-[26px] leading-snug font-medium text-[#1f1a14]">
               {q.question}
             </h1>
+            {q.multi && (
+              <p className="mt-1.5 text-[12.5px] font-medium text-[#a8721f]">
+                Select all that apply
+              </p>
+            )}
 
             {/* Options — a compact clock grid for time questions, stacked
                 pills for everything else, plus "Other" for a custom answer. */}
@@ -214,16 +235,12 @@ export default function OnboardingPage() {
               }`}
             >
               {q.options.map((opt) => {
-                const active = selected[current] === opt;
+                const active = (selected[current] ?? []).includes(opt);
                 return (
                   <button
                     key={opt}
                     type="button"
-                    onClick={() => {
-                      const copy = [...selected];
-                      copy[current] = opt;
-                      setSelected(copy);
-                    }}
+                    onClick={() => pick(current, opt, !!q.multi)}
                     className={`rounded-xl border px-4 text-left text-[14px] transition-all duration-150 ${
                       q.type === "time"
                         ? "py-2.5 text-center font-mono text-[13px]"
@@ -240,15 +257,11 @@ export default function OnboardingPage() {
               })}
               <button
                 type="button"
-                onClick={() => {
-                  const copy = [...selected];
-                  copy[current] = OTHER;
-                  setSelected(copy);
-                }}
+                onClick={() => pick(current, OTHER, !!q.multi)}
                 className={`rounded-xl border px-4 text-left text-[14px] transition-all duration-150 ${
                   q.type === "time" ? "py-2.5 text-center" : "py-3"
                 } ${
-                  selected[current] === OTHER
+                  (selected[current] ?? []).includes(OTHER)
                     ? "border-[#a8721f] bg-[#a8721f]/10 font-medium text-[#7d5a1e] shadow-[0_0_0_1px_#a8721f]"
                     : "border-dashed border-[#1f1a14]/20 bg-transparent text-[#6b6155] hover:border-[#a8721f]/50"
                 }`}
@@ -257,7 +270,7 @@ export default function OnboardingPage() {
               </button>
             </div>
 
-            {selected[current] === OTHER && (
+            {(selected[current] ?? []).includes(OTHER) && (
               <textarea
                 autoFocus
                 rows={2}

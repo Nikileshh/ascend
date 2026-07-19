@@ -88,6 +88,7 @@ const questionsSchema = {
       question: { type: "string" },
       type: { type: "string", enum: ["choice", "time"] },
       options: strings,
+      multi: { type: "boolean" },
     },
     required: ["question", "type", "options"],
   },
@@ -172,6 +173,9 @@ export interface OnboardingQuestion {
   question: string;
   type: "choice" | "time";
   options: string[];
+  // multi = several options can apply (e.g. commitments); UI toggles instead
+  // of replacing, and the answer is the selections joined with commas.
+  multi?: boolean;
 }
 
 const WAKE_TIMES = [
@@ -244,8 +248,9 @@ export function goalAgentQuestions(
       options: SLEEP_TIMES,
     },
     {
-      question: "What do you consider your weakest area for this goal?",
+      question: "What do you consider your weakest areas for this goal?",
       type: "choice",
+      multi: true,
       options: [
         "Staying consistent",
         "Core concepts and fundamentals",
@@ -257,6 +262,7 @@ export function goalAgentQuestions(
     {
       question: "What other commitments shape your day?",
       type: "choice",
+      multi: true,
       options: [
         "Full-time job",
         "College / school",
@@ -286,17 +292,21 @@ async function goalAgentQuestionsLive(
     `You are the Goal Analysis Agent of Ascend, a personal AI coaching app.
 A user has this goal: "${goal}".
 Create exactly 8 short onboarding questions, each with tap-to-select answer options, covering in order: 1) current level/experience, 2) target deadline or attempt, 3) hours available per day, 4) usual wake-up time, 5) usual sleep time, 6) weakest area for this goal, 7) other commitments (work/college/family), 8) when they focus best. Tailor the wording and the options to this specific goal.
-Each item: "question" (short), "type" ("time" for the wake-up and sleep questions, otherwise "choice"), "options" (4-6 short, realistic, mutually exclusive answers relevant to that question — for "time" questions give exactly these 12 clock times: wake-up ${JSON.stringify(WAKE_TIMES)}, sleep ${JSON.stringify(SLEEP_TIMES)}). Never include an "Other" option — the app adds one automatically.
-Respond with ONLY a JSON array of 8 objects {question, type, options}.`,
+Each item: "question" (short), "type" ("time" for the wake-up and sleep questions, otherwise "choice"), "options" (4-6 short, realistic answers relevant to that question — for "time" questions give exactly these 12 clock times: wake-up ${JSON.stringify(WAKE_TIMES)}, sleep ${JSON.stringify(SLEEP_TIMES)}), and "multi" (true only where several answers can apply at once — typically the weakest-areas and commitments questions; false elsewhere). Never include an "Other" option — the app adds one automatically.
+Respond with ONLY a JSON array of 8 objects {question, type, options, multi}.`,
     { schema: questionsSchema },
   );
   const parsed = extractJson<OnboardingQuestion[]>(text);
-  // Guard against a model that ignores the shape.
+  // Guard against a model that ignores the shape (multi normalized below).
   return parsed
     .filter(
       (q) => q?.question && Array.isArray(q.options) && q.options.length >= 2,
     )
-    .map((q) => ({ ...q, type: q.type === "time" ? "time" : "choice" }));
+    .map((q) => ({
+      ...q,
+      type: q.type === "time" ? "time" : "choice",
+      multi: q.type !== "time" && !!q.multi,
+    }));
 }
 
 // 1b. Goal Agent — difficulty/timeline analysis
