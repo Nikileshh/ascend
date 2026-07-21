@@ -116,6 +116,36 @@ export const COPY_SECTIONS: CopySection[] = [
     ],
   },
   {
+    title: "Scene breaks (dark mountain bands)",
+    hint: "The two cinematic statements between landing sections.",
+    fields: [
+      {
+        key: "scene1.heading",
+        label: "First statement",
+        default: "The summit is earned daily.",
+      },
+      {
+        key: "scene1.sub",
+        label: "First statement — subtext",
+        multiline: true,
+        default:
+          "Not in bursts of motivation — in small, scheduled wins that stack.",
+      },
+      {
+        key: "scene2.heading",
+        label: "Second statement",
+        default: "Discipline is a system, not a mood.",
+      },
+      {
+        key: "scene2.sub",
+        label: "Second statement — subtext",
+        multiline: true,
+        default:
+          "Ascend plans your day so showing up is the only decision left.",
+      },
+    ],
+  },
+  {
     title: "Closing quote & footer",
     hint: "The big statement at the bottom of the landing page.",
     fields: [
