@@ -191,17 +191,17 @@ export default function DashboardLayout({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/example.jpg"
+          src="/dashboard-bg.jpg"
           alt=""
-          className="animate-ken-burns h-full w-full object-cover opacity-[0.5]"
+          className="animate-ken-burns h-full w-full object-cover opacity-[0.8]"
         />
-        {/* radial white overlay: ~96% white in the center (where content sits),
-            softening to ~84% at the edges so motion is only subconsciously felt */}
+        {/* radial white overlay: strongest in the center (where content sits),
+            lighter at the edges so the peaks stay clearly visible */}
         <div
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(130% 120% at 50% 35%, rgba(244,239,230,0.965) 45%, rgba(244,239,230,0.86) 100%)",
+              "radial-gradient(130% 120% at 50% 35%, rgba(244,239,230,0.88) 42%, rgba(244,239,230,0.58) 100%)",
           }}
         />
         {/* whisper-soft indigo ambience */}
