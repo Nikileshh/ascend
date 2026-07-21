@@ -121,24 +121,36 @@ export const COPY_SECTIONS: CopySection[] = [
     fields: [
       {
         key: "scene1.heading",
-        label: "First statement",
+        label: "Opening statement (coffee desk)",
         default: "The summit is earned daily.",
       },
       {
         key: "scene1.sub",
-        label: "First statement — subtext",
+        label: "Opening statement — subtext",
         multiline: true,
         default:
           "Not in bursts of motivation — in small, scheduled wins that stack.",
       },
       {
+        key: "scene3.heading",
+        label: "Middle statement (misty hills)",
+        default: "Some days you can't see the summit.",
+      },
+      {
+        key: "scene3.sub",
+        label: "Middle statement — subtext",
+        multiline: true,
+        default:
+          "Walk anyway. The path is still under your feet — and your plan knows the way.",
+      },
+      {
         key: "scene2.heading",
-        label: "Second statement",
+        label: "Closing statement (forest road)",
         default: "Discipline is a system, not a mood.",
       },
       {
         key: "scene2.sub",
-        label: "Second statement — subtext",
+        label: "Closing statement — subtext",
         multiline: true,
         default:
           "Ascend plans your day so showing up is the only decision left.",
