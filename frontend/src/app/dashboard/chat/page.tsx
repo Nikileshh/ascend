@@ -76,7 +76,7 @@ export default function ChatPage() {
               <div
                 className={`max-w-[82%] border px-4 py-[11px] text-[13.5px] leading-[21px] ${
                   user
-                    ? "rounded-2xl rounded-br-md border-[#a8721f]/50 bg-gradient-to-br from-[#a8721f] to-[#7d5a1e] text-white"
+                    ? "rounded-2xl rounded-br-md border-[#d9622b]/50 bg-gradient-to-br from-[#d9622b] to-[#b04d18] text-white"
                     : "rounded-2xl rounded-bl-md border-[#1f1a14]/[0.09] bg-[#1f1a14]/[0.03] text-[#4a4239]"
                 }`}
               >
@@ -104,12 +104,12 @@ export default function ChatPage() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask anything…"
-          className="min-w-0 flex-1 rounded-full border border-[#1f1a14]/15 bg-white/80 px-5 py-3 text-[13.5px] text-[#1f1a14] placeholder-[#9a8f80] transition-colors outline-none focus:border-[#a8721f]"
+          className="min-w-0 flex-1 rounded-full border border-[#1f1a14]/15 bg-white/80 px-5 py-3 text-[13.5px] text-[#1f1a14] placeholder-[#9a8f80] transition-colors outline-none focus:border-[#d9622b]"
         />
         <button
           type="submit"
           disabled={sending || !input.trim()}
-          className="shrink-0 rounded-full border border-[#a8721f]/50 bg-gradient-to-br from-[#a8721f] to-[#7d5a1e] px-6 py-3 text-[13.5px] font-medium text-white shadow-[0_0_20px_rgba(168,114,31,0.28)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-45"
+          className="shrink-0 rounded-full border border-[#d9622b]/50 bg-gradient-to-br from-[#d9622b] to-[#b04d18] px-6 py-3 text-[13.5px] font-medium text-white shadow-[0_0_20px_rgba(217,98,43,0.28)] transition-transform hover:scale-105 active:scale-95 disabled:opacity-45"
         >
           Send
         </button>

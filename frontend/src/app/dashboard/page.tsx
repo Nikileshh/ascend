@@ -113,8 +113,8 @@ export default function OverviewPage() {
             {hello}
           </h1>
           <div className="mt-3 flex flex-wrap items-center gap-2.5">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#a8721f]/30 bg-[#a8721f]/12 px-3.5 py-1.5 text-[13px] font-medium text-[#1f1a14]">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#a8721f]" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#d9622b]/30 bg-[#d9622b]/12 px-3.5 py-1.5 text-[13px] font-medium text-[#1f1a14]">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#d9622b]" />
               {plan.goal}
             </span>
             <span className="rounded-full border border-[#1f1a14]/[0.09] bg-white/70 px-3 py-1.5 text-xs text-[#6b6155]">
@@ -165,7 +165,7 @@ export default function OverviewPage() {
                   className="grid grid-cols-[76px_20px_1fr] gap-2.5 sm:grid-cols-[112px_20px_1fr] sm:gap-3"
                 >
                   <p
-                    className={`pt-0.5 text-right font-mono text-[11px] break-words sm:text-[12.5px] sm:whitespace-nowrap ${isNow ? "text-[#7d5a1e]" : "text-[#6b6155]"}`}
+                    className={`pt-0.5 text-right font-mono text-[11px] break-words sm:text-[12.5px] sm:whitespace-nowrap ${isNow ? "text-[#b04d18]" : "text-[#6b6155]"}`}
                   >
                     {slot.time}
                   </p>
@@ -173,7 +173,7 @@ export default function OverviewPage() {
                     <span
                       className={`mt-1.5 h-[9px] w-[9px] shrink-0 rounded-full border-2 ${
                         isNow
-                          ? "animate-pulse border-[#a8721f] bg-[#a8721f]"
+                          ? "animate-pulse border-[#d9622b] bg-[#d9622b]"
                           : isPast
                             ? "border-[#1f1a14]/25 bg-[#1f1a14]/25"
                             : "border-[#1f1a14]/20 bg-transparent"
@@ -189,7 +189,7 @@ export default function OverviewPage() {
                     >
                       {slot.activity}
                       {isNow && (
-                        <span className="ml-2 text-[11px] font-semibold tracking-wider text-[#7d5a1e] uppercase">
+                        <span className="ml-2 text-[11px] font-semibold tracking-wider text-[#b04d18] uppercase">
                           Now
                         </span>
                       )}
@@ -224,7 +224,7 @@ export default function OverviewPage() {
                   cy="64"
                   r="52"
                   fill="none"
-                  stroke="#a8721f"
+                  stroke="#d9622b"
                   strokeWidth="10"
                   strokeLinecap="round"
                   strokeDasharray={C}
@@ -257,7 +257,7 @@ export default function OverviewPage() {
                   <span
                     className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border-[1.5px] transition-all ${
                       done
-                        ? "border-[#a8721f] bg-[#a8721f] shadow-[0_0_14px_rgba(168,114,31,0.3)]"
+                        ? "border-[#d9622b] bg-[#d9622b] shadow-[0_0_14px_rgba(217,98,43,0.3)]"
                         : "border-[#1f1a14]/20 bg-white"
                     }`}
                   >
@@ -308,7 +308,7 @@ export default function OverviewPage() {
         </p>
         <div className="mt-4 h-[5px] overflow-hidden rounded-full bg-[#1f1a14]/[0.06]">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-[#a8721f] to-[#e6c992] shadow-[0_0_12px_rgba(168,114,31,0.4)]"
+            className="h-full rounded-full bg-gradient-to-r from-[#d9622b] to-[#e6c992] shadow-[0_0_12px_rgba(217,98,43,0.4)]"
             style={{
               width: `${Math.max(4, 100 / plan.profile.estimatedMonths)}%`,
             }}
@@ -319,7 +319,7 @@ export default function OverviewPage() {
             <span>Next up · {plan.roadmap[1].title}</span>
             <Link
               href="/dashboard/roadmap"
-              className="text-[#7d5a1e] hover:underline"
+              className="text-[#b04d18] hover:underline"
             >
               Full roadmap →
             </Link>

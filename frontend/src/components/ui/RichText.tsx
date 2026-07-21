@@ -40,7 +40,7 @@ export function RichText({ text }: { text: string }) {
                 key={j}
                 className="flex gap-3 text-[16px] leading-[26px] text-[#4a4239]"
               >
-                <span className="mt-[9px] h-[6px] w-[6px] shrink-0 rounded-full bg-[#a8721f]" />
+                <span className="mt-[9px] h-[6px] w-[6px] shrink-0 rounded-full bg-[#d9622b]" />
                 <span>
                   <Inline text={l.replace(/^([•\-*]|\d+\.)\s+/, "")} />
                 </span>

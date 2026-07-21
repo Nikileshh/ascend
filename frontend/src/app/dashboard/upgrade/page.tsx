@@ -80,7 +80,7 @@ export default function UpgradePage() {
   return (
     <div className="mx-auto max-w-[1080px] px-6 py-10 md:px-10">
       <header className="mb-8">
-        <p className="font-mono text-[11px] tracking-[0.16em] text-[#a8721f] uppercase">
+        <p className="font-mono text-[11px] tracking-[0.16em] text-[#d9622b] uppercase">
           Ascend Premium
         </p>
         <h1 className="font-display mt-2 text-[32px] leading-tight font-medium tracking-tight text-[#1f1a14] sm:text-[42px]">
@@ -102,7 +102,7 @@ export default function UpgradePage() {
                 key={p}
                 className="flex items-start gap-2.5 text-[15px] text-[#4a4239]"
               >
-                <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#a8721f]" />
+                <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#d9622b]" />
                 {p}
               </li>
             ))}
@@ -118,7 +118,7 @@ export default function UpgradePage() {
                   key={p}
                   className="flex items-start gap-2.5 text-[15px] text-[#4a4239]"
                 >
-                  <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#a8721f]" />
+                  <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#d9622b]" />
                   {p}
                 </li>
               ))}
@@ -134,8 +134,8 @@ export default function UpgradePage() {
           {/* Right: pay via GPay QR */}
           <GlassCard title="Pay with GPay / UPI" gradient>
             {info?.pending ? (
-              <div className="rounded-2xl border border-[#a8721f]/30 bg-[#a8721f]/[0.07] p-5 text-center">
-                <p className="text-[15px] font-medium text-[#7d5a1e]">
+              <div className="rounded-2xl border border-[#d9622b]/30 bg-[#d9622b]/[0.07] p-5 text-center">
+                <p className="text-[15px] font-medium text-[#b04d18]">
                   Payment received — awaiting review
                 </p>
                 <p className="mt-1.5 text-[13px] text-[#6b6155]">
@@ -192,7 +192,7 @@ export default function UpgradePage() {
                     </p>
                     <a
                       href={upiLink}
-                      className="mt-1 inline-block text-[12px] font-medium text-[#7d5a1e] hover:underline"
+                      className="mt-1 inline-block text-[12px] font-medium text-[#b04d18] hover:underline"
                     >
                       Open in a UPI app →
                     </a>

@@ -137,7 +137,7 @@ export default function TimetablePage() {
             ))}
             <button
               onClick={() => setDraft([...draft, { time: "", activity: "" }])}
-              className="self-start text-[13px] font-medium text-[#7d5a1e] hover:underline"
+              className="self-start text-[13px] font-medium text-[#b04d18] hover:underline"
             >
               + Add a slot
             </button>
@@ -169,11 +169,11 @@ export default function TimetablePage() {
                 <div
                   key={i}
                   className={`relative flex flex-col gap-0.5 rounded-xl border-b border-[#1f1a14]/[0.06] px-2.5 py-[11px] last:border-0 sm:flex-row sm:items-center sm:gap-4 ${
-                    active ? "bg-[#a8721f]/12" : ""
+                    active ? "bg-[#d9622b]/12" : ""
                   }`}
                 >
                   <span
-                    className={`shrink-0 font-mono text-[12px] sm:w-[118px] sm:text-[12.5px] ${active ? "text-[#7d5a1e]" : "text-[#9a8f80] sm:text-[#6b6155]"}`}
+                    className={`shrink-0 font-mono text-[12px] sm:w-[118px] sm:text-[12.5px] ${active ? "text-[#b04d18]" : "text-[#9a8f80] sm:text-[#6b6155]"}`}
                   >
                     {slot.time}
                   </span>
@@ -183,7 +183,7 @@ export default function TimetablePage() {
                     {slot.activity}
                   </span>
                   {active && (
-                    <span className="absolute top-1/2 right-2.5 -translate-y-1/2 rounded-full bg-[#a8721f] px-2.5 py-[3px] text-[10px] font-semibold tracking-wider text-white uppercase shadow-[0_0_14px_rgba(168,114,31,0.4)] sm:static sm:ml-auto sm:translate-y-0">
+                    <span className="absolute top-1/2 right-2.5 -translate-y-1/2 rounded-full bg-[#d9622b] px-2.5 py-[3px] text-[10px] font-semibold tracking-wider text-white uppercase shadow-[0_0_14px_rgba(217,98,43,0.4)] sm:static sm:ml-auto sm:translate-y-0">
                       Now
                     </span>
                   )}

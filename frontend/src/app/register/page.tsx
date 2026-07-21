@@ -92,7 +92,7 @@ export default function RegisterPage() {
           Didn&apos;t get it? Check spam, or{" "}
           <button
             onClick={resend}
-            className="font-medium text-[#a8721f] hover:underline"
+            className="font-medium text-[#d9622b] hover:underline"
           >
             resend the code
           </button>
@@ -145,7 +145,7 @@ export default function RegisterPage() {
         Already have an account?{" "}
         <Link
           href="/login"
-          className="font-medium text-[#a8721f] hover:underline"
+          className="font-medium text-[#d9622b] hover:underline"
         >
           Log in
         </Link>

@@ -28,7 +28,7 @@ export default function RoadmapPage() {
               <div
                 className={`relative z-[1] flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full border font-mono text-xs font-semibold ${
                   current
-                    ? "border-[#a8721f] bg-[#a8721f] text-white shadow-[0_2px_14px_rgba(168,114,31,0.3)]"
+                    ? "border-[#d9622b] bg-[#d9622b] text-white shadow-[0_2px_14px_rgba(217,98,43,0.3)]"
                     : "border-[#1f1a14]/15 bg-white text-[#6b6155]"
                 }`}
               >
@@ -36,7 +36,7 @@ export default function RoadmapPage() {
               </div>
               <div
                 className={`flex-1 rounded-2xl border bg-white/80 p-5 shadow-[0_4px_24px_rgba(24,24,40,0.06)] backdrop-blur-xl ${
-                  current ? "border-[#a8721f]/30" : "border-[#1f1a14]/[0.09]"
+                  current ? "border-[#d9622b]/30" : "border-[#1f1a14]/[0.09]"
                 }`}
               >
                 <div className="flex items-center justify-between gap-3">
@@ -44,7 +44,7 @@ export default function RoadmapPage() {
                     Month {m.month} · {m.title}
                   </p>
                   {current && (
-                    <span className="shrink-0 text-[10.5px] font-semibold tracking-wider text-[#7d5a1e] uppercase">
+                    <span className="shrink-0 text-[10.5px] font-semibold tracking-wider text-[#b04d18] uppercase">
                       Current
                     </span>
                   )}
@@ -71,9 +71,9 @@ export default function RoadmapPage() {
                       {m.weeks.map((w) => (
                         <div
                           key={w.week}
-                          className="rounded-xl border border-[#1f1a14]/[0.09] bg-[#a8721f]/[0.04] px-3 py-2.5"
+                          className="rounded-xl border border-[#1f1a14]/[0.09] bg-[#d9622b]/[0.04] px-3 py-2.5"
                         >
-                          <p className="text-[10.5px] font-semibold tracking-wider text-[#7d5a1e] uppercase">
+                          <p className="text-[10.5px] font-semibold tracking-wider text-[#b04d18] uppercase">
                             Week {w.week}
                           </p>
                           <p className="mt-1 text-[12.5px] leading-[18px] text-[#4a4239]">

@@ -31,12 +31,12 @@ export function Pricing() {
       </ScrollReveal>
 
       <ScrollReveal className="mx-auto mt-14 max-w-lg">
-        <div className="flex flex-col rounded-3xl border border-[#a8721f]/40 bg-gradient-to-br from-[#a8721f]/12 via-white/[0.03] to-white/[0.03] p-8 shadow-[0_0_60px_rgba(199,154,74,0.18)] backdrop-blur-xl">
+        <div className="flex flex-col rounded-3xl border border-[#d9622b]/40 bg-gradient-to-br from-[#d9622b]/12 via-white/[0.03] to-white/[0.03] p-8 shadow-[0_0_60px_rgba(199,154,74,0.18)] backdrop-blur-xl">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-[#1f1a14]">
               {plan.name}
             </h3>
-            <span className="rounded-full bg-gradient-to-br from-[#a8721f] to-[#7d5a1e] px-3 py-1 text-xs font-medium text-white shadow-[0_0_16px_rgba(168,114,31,0.32)]">
+            <span className="rounded-full bg-gradient-to-br from-[#d9622b] to-[#b04d18] px-3 py-1 text-xs font-medium text-white shadow-[0_0_16px_rgba(217,98,43,0.32)]">
               14-day free trial
             </span>
           </div>
@@ -55,7 +55,7 @@ export function Pricing() {
                 key={feature}
                 className="flex items-center gap-2.5 text-sm text-[#4a4239]"
               >
-                <span className="text-[#a8721f]">✓</span>
+                <span className="text-[#d9622b]">✓</span>
                 {feature}
               </li>
             ))}

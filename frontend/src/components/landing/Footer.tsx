@@ -10,7 +10,7 @@ export function Footer() {
       <div className="mx-auto w-full max-w-6xl px-6 py-16">
         <ScrollReveal>
           {/* Cinematic closing shot: the summit at dusk */}
-          <div className="relative overflow-hidden rounded-3xl border border-[#a8721f]/30 px-8 py-20 text-center">
+          <div className="relative overflow-hidden rounded-3xl border border-[#d9622b]/30 px-8 py-20 text-center">
             <div aria-hidden className="pointer-events-none absolute inset-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

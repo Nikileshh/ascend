@@ -126,7 +126,7 @@ export default function LoginPage() {
           Didn&apos;t get it? Check spam, or{" "}
           <button
             onClick={() => api("/auth/resend", { body: { email } })}
-            className="font-medium text-[#a8721f] hover:underline"
+            className="font-medium text-[#d9622b] hover:underline"
           >
             resend the code
           </button>
@@ -159,7 +159,7 @@ export default function LoginPage() {
           Remembered it?{" "}
           <button
             onClick={() => go("login")}
-            className="font-medium text-[#a8721f] hover:underline"
+            className="font-medium text-[#d9622b] hover:underline"
           >
             Back to log in
           </button>
@@ -176,7 +176,7 @@ export default function LoginPage() {
       >
         <form onSubmit={onReset} className="space-y-4">
           {notice && (
-            <p className="rounded-xl border border-[#a8721f]/30 bg-[#a8721f]/[0.08] px-4 py-2.5 text-[13px] text-[#7d5a1e]">
+            <p className="rounded-xl border border-[#d9622b]/30 bg-[#d9622b]/[0.08] px-4 py-2.5 text-[13px] text-[#b04d18]">
               {notice}
             </p>
           )}
@@ -206,7 +206,7 @@ export default function LoginPage() {
           Didn&apos;t get a code?{" "}
           <button
             onClick={() => go("forgot")}
-            className="font-medium text-[#a8721f] hover:underline"
+            className="font-medium text-[#d9622b] hover:underline"
           >
             Send again
           </button>
@@ -239,7 +239,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => go("forgot")}
-            className="text-[13px] font-medium text-[#a8721f] hover:underline"
+            className="text-[13px] font-medium text-[#d9622b] hover:underline"
           >
             Forgot password?
           </button>
@@ -253,7 +253,7 @@ export default function LoginPage() {
         New to Ascend?{" "}
         <Link
           href="/register"
-          className="font-medium text-[#a8721f] hover:underline"
+          className="font-medium text-[#d9622b] hover:underline"
         >
           Create an account
         </Link>

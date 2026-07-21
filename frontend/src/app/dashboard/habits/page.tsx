@@ -187,7 +187,7 @@ export default function HabitsPage() {
                   onClick={() => addHabit(s)}
                   disabled={busy}
                   title={s.why}
-                  className="rounded-full border border-[#a8721f]/25 bg-[#a8721f]/[0.06] px-3.5 py-1.5 text-[12.5px] font-medium text-[#7d5a1e] transition-colors hover:bg-[#a8721f]/12 disabled:opacity-50"
+                  className="rounded-full border border-[#d9622b]/25 bg-[#d9622b]/[0.06] px-3.5 py-1.5 text-[12.5px] font-medium text-[#b04d18] transition-colors hover:bg-[#d9622b]/12 disabled:opacity-50"
                 >
                   + {s.name}
                 </button>

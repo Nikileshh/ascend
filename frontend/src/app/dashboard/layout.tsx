@@ -167,11 +167,11 @@ export default function DashboardLayout({
         href={t.href}
         className={`flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[14px] transition-all duration-200 ${
           active
-            ? "bg-[#a8721f]/10 font-semibold text-[#7d5a1e]"
+            ? "bg-[#d9622b]/10 font-semibold text-[#b04d18]"
             : "font-medium text-[#6b6155] hover:bg-[#1f1a14]/[0.04] hover:text-[#1f1a14]"
         }`}
       >
-        <span className={active ? "text-[#a8721f]" : "text-[#9a8f80]"}>
+        <span className={active ? "text-[#d9622b]" : "text-[#9a8f80]"}>
           <NavIcon d={t.icon} />
         </span>
         {t.label}
@@ -205,7 +205,7 @@ export default function DashboardLayout({
           }}
         />
         {/* whisper-soft indigo ambience */}
-        <div className="animate-blob absolute -top-52 left-[18%] h-[560px] w-[560px] rounded-full bg-[#a8721f]/[0.06] blur-[100px]" />
+        <div className="animate-blob absolute -top-52 left-[18%] h-[560px] w-[560px] rounded-full bg-[#d9622b]/[0.06] blur-[100px]" />
         <div className="animate-blob absolute -right-24 -bottom-60 h-[620px] w-[620px] rounded-full bg-[#e6c992]/[0.06] blur-[110px] [animation-delay:-7s]" />
       </div>
 
@@ -215,7 +215,7 @@ export default function DashboardLayout({
           href="/dashboard"
           className="mb-8 flex items-center gap-2.5 px-2 text-[15px] font-semibold tracking-[-0.01em] text-[#1f1a14]"
         >
-          <span className="flex h-7 w-7 items-center justify-center rounded-[9px] bg-[#a8721f] text-xs text-white">
+          <span className="flex h-7 w-7 items-center justify-center rounded-[9px] bg-[#d9622b] text-xs text-white">
             ▲
           </span>
           Ascend
@@ -223,16 +223,16 @@ export default function DashboardLayout({
         <nav className="flex flex-col gap-0.5">{nav}</nav>
         <div className="mt-auto pt-4">
           {premium ? (
-            <div className="mb-3 flex items-center gap-2 rounded-xl border border-[#a8721f]/25 bg-[#a8721f]/[0.07] px-3 py-2">
+            <div className="mb-3 flex items-center gap-2 rounded-xl border border-[#d9622b]/25 bg-[#d9622b]/[0.07] px-3 py-2">
               <span className="text-[13px]">✦</span>
-              <span className="text-[12.5px] font-medium text-[#7d5a1e]">
+              <span className="text-[12.5px] font-medium text-[#b04d18]">
                 Premium active
               </span>
             </div>
           ) : (
             <Link
               href="/dashboard/upgrade"
-              className="mb-3 block rounded-xl bg-gradient-to-b from-[#a8721f] to-[#7d5a1e] px-3.5 py-3 text-white shadow-[0_10px_24px_-10px_rgba(168,114,31,0.7)] transition-transform hover:-translate-y-0.5"
+              className="mb-3 block rounded-xl bg-gradient-to-b from-[#d9622b] to-[#b04d18] px-3.5 py-3 text-white shadow-[0_10px_24px_-10px_rgba(217,98,43,0.7)] transition-transform hover:-translate-y-0.5"
             >
               <p className="text-[13px] font-semibold">Go Premium ✦</p>
               <p className="mt-0.5 text-[11.5px] text-white/80">
@@ -241,7 +241,7 @@ export default function DashboardLayout({
             </Link>
           )}
           <div className="flex items-center gap-2.5 rounded-xl border border-[#1f1a14]/10 bg-white px-2.5 py-2.5">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#a8721f]/12 text-[12px] font-semibold text-[#7d5a1e]">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#d9622b]/12 text-[12px] font-semibold text-[#b04d18]">
               {initials}
             </div>
             <div className="min-w-0 flex-1">
@@ -251,7 +251,7 @@ export default function DashboardLayout({
               <div className="mt-0.5 flex items-center gap-2.5 text-[11.5px]">
                 <Link
                   href="/onboarding"
-                  className="text-[#7d5a1e] hover:underline"
+                  className="text-[#b04d18] hover:underline"
                 >
                   New goal
                 </Link>
@@ -298,7 +298,7 @@ export default function DashboardLayout({
                 href={t.href}
                 className={`rounded-lg px-3 py-1.5 text-xs whitespace-nowrap ${
                   pathname === t.href
-                    ? "bg-[#a8721f]/12 font-medium text-[#7d5a1e]"
+                    ? "bg-[#d9622b]/12 font-medium text-[#b04d18]"
                     : "text-[#6b6155]"
                 }`}
               >
@@ -310,8 +310,8 @@ export default function DashboardLayout({
                 href="/dashboard/upgrade"
                 className={`rounded-lg px-3 py-1.5 text-xs font-medium whitespace-nowrap ${
                   pathname === "/dashboard/upgrade"
-                    ? "bg-[#a8721f] text-white"
-                    : "bg-[#a8721f]/12 text-[#7d5a1e]"
+                    ? "bg-[#d9622b] text-white"
+                    : "bg-[#d9622b]/12 text-[#b04d18]"
                 }`}
               >
                 Go Premium ✦
@@ -322,25 +322,25 @@ export default function DashboardLayout({
 
         {reminder && (
           <div className="mx-auto mt-4 max-w-[1080px] px-4 md:px-10">
-            <div className="flex items-center justify-between gap-4 rounded-2xl border border-[#a8721f]/30 bg-[#a8721f]/10 px-4 py-3 text-sm text-[#4a4239] backdrop-blur-xl">
+            <div className="flex items-center justify-between gap-4 rounded-2xl border border-[#d9622b]/30 bg-[#d9622b]/10 px-4 py-3 text-sm text-[#4a4239] backdrop-blur-xl">
               <p>
                 ⏰ It&apos;s time for:{" "}
                 <strong className="font-semibold text-[#1f1a14]">
                   {reminder.activity}
                 </strong>{" "}
-                <span className="text-[#7d5a1e]">({reminder.time})</span>
+                <span className="text-[#b04d18]">({reminder.time})</span>
               </p>
               <span className="flex shrink-0 gap-2">
                 <Link
                   href="/dashboard/timetable"
-                  className="rounded-full bg-gradient-to-br from-[#a8721f] to-[#7d5a1e] px-3.5 py-1 text-xs font-medium text-white"
+                  className="rounded-full bg-gradient-to-br from-[#d9622b] to-[#b04d18] px-3.5 py-1 text-xs font-medium text-white"
                   onClick={() => setReminder(null)}
                 >
                   Can&apos;t now — adjust
                 </Link>
                 <button
                   onClick={() => setReminder(null)}
-                  className="rounded-full border border-[#a8721f]/40 px-3.5 py-1 text-xs"
+                  className="rounded-full border border-[#d9622b]/40 px-3.5 py-1 text-xs"
                 >
                   Done
                 </button>

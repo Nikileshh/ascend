@@ -55,8 +55,8 @@ const C = {
   body: "#4a4239",
   soft: "#6b6155",
   faint: "#9a8f80",
-  amber: "#a8721f",
-  amberDark: "#7d5a1e",
+  amber: "#d9622b",
+  amberDark: "#b04d18",
   champagne: "#fbf3e2",
 };
 const serif = "Georgia, 'Times New Roman', serif";

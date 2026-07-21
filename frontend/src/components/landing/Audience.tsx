@@ -29,7 +29,7 @@ export function Audience() {
           {audiences.map((audience) => (
             <span
               key={audience}
-              className="rounded-full border border-[#1f1a14]/[0.09] bg-white px-5 py-2 text-sm font-medium text-[#4a4239] backdrop-blur transition-colors hover:border-[#a8721f]/50 hover:text-[#1f1a14]"
+              className="rounded-full border border-[#1f1a14]/[0.09] bg-white px-5 py-2 text-sm font-medium text-[#4a4239] backdrop-blur transition-colors hover:border-[#d9622b]/50 hover:text-[#1f1a14]"
             >
               {audience}
             </span>

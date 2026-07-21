@@ -56,7 +56,7 @@ export default function ReflectionPage() {
                 setAdjustments("");
                 setReflection({ win: "", distraction: "", lesson: "" });
               }}
-              className="mt-4 text-[13px] font-medium text-[#7d5a1e] hover:underline"
+              className="mt-4 text-[13px] font-medium text-[#b04d18] hover:underline"
             >
               Write another reflection
             </button>

@@ -80,9 +80,9 @@ export function Features() {
         {features.map((feature) => (
           <div
             key={feature.title}
-            className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 backdrop-blur-xl transition-colors hover:border-[#a8721f]/40"
+            className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#a8721f] to-[#7d5a1e] text-lg text-white shadow-[0_0_18px_rgba(168,114,31,0.3)]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#d9622b] to-[#b04d18] text-lg text-white shadow-[0_0_18px_rgba(217,98,43,0.3)]">
               {feature.icon}
             </div>
             <h3 className="mt-4 text-lg font-semibold text-[#1f1a14]">

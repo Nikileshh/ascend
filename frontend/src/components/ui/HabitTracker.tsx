@@ -54,7 +54,7 @@ export function HabitTracker({
   return (
     <div>
       <div className="mb-6 flex items-center gap-4">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-[#a8721f]/30 bg-[#a8721f]/12 text-base font-semibold text-[#7d5a1e] shadow-[0_2px_12px_rgba(168,114,31,0.18)]">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-[#d9622b]/30 bg-[#d9622b]/12 text-base font-semibold text-[#b04d18] shadow-[0_2px_12px_rgba(217,98,43,0.18)]">
           {todayScore}%
         </div>
         <div>
@@ -78,7 +78,7 @@ export function HabitTracker({
               {days.map((d) => (
                 <th
                   key={d}
-                  className={`px-1 text-center font-mono text-[10px] ${d === today ? "font-semibold text-[#7d5a1e]" : "font-normal text-[#9a8f80]"}`}
+                  className={`px-1 text-center font-mono text-[10px] ${d === today ? "font-semibold text-[#b04d18]" : "font-normal text-[#9a8f80]"}`}
                 >
                   <span className="block">
                     {new Date(d).toLocaleDateString("en", { month: "short" })}
@@ -103,7 +103,7 @@ export function HabitTracker({
                         onClick={() => toggle(d, habit)}
                         className={`h-[26px] w-[26px] rounded-lg border transition-all hover:scale-110 active:scale-90 ${
                           status === "done"
-                            ? "border-[#a8721f] bg-[#a8721f] shadow-[0_0_10px_rgba(168,114,31,0.3)]"
+                            ? "border-[#d9622b] bg-[#d9622b] shadow-[0_0_10px_rgba(217,98,43,0.3)]"
                             : status === "missed"
                               ? "border-[#DC2626] bg-[#DC2626]"
                               : "border-[#1f1a14]/10 bg-[#1f1a14]/[0.03] hover:bg-[#1f1a14]/[0.06]"

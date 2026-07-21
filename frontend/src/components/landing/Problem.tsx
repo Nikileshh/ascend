@@ -57,7 +57,7 @@ export function Problem() {
         {blockers.map((blocker) => (
           <div
             key={blocker}
-            className="rounded-2xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-6 backdrop-blur-xl transition-colors hover:border-[#a8721f]/40"
+            className="rounded-2xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-6 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
           >
             <p className="text-sm font-medium text-[#9a8f80]">
               They don&apos;t know

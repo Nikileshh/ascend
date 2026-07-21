@@ -1,6 +1,6 @@
 // Warm editorial design system (Ascend) — bone canvas, espresso ink,
 // amber accent, champagne highlight. Cormorant serif for titles.
-export const ACCENT = "#a8721f";
+export const ACCENT = "#d9622b";
 
 export function GlassCard({
   title,
@@ -40,8 +40,8 @@ export function GlassCard({
 export function CoachBadge({ caption }: { caption?: string }) {
   return (
     <div className="mb-4 flex items-center gap-2">
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#a8721f]/25 bg-[#a8721f]/[0.08] px-3 py-1 font-mono text-[11px] font-medium tracking-[0.14em] text-[#a8721f] uppercase">
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#a8721f]" />
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-[#d9622b]/25 bg-[#d9622b]/[0.08] px-3 py-1 font-mono text-[11px] font-medium tracking-[0.14em] text-[#d9622b] uppercase">
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#d9622b]" />
         AI Coach
       </span>
       {caption && <span className="text-[13px] text-[#6b6155]">{caption}</span>}
@@ -51,7 +51,7 @@ export function CoachBadge({ caption }: { caption?: string }) {
 
 // Inputs: white field, warm border, gold focus ring
 export const inputDark =
-  "w-full rounded-xl border border-[#1f1a14]/[0.16] bg-white px-4 py-2.5 text-[15px] text-[#1f1a14] placeholder-[#9a8f80] outline-none transition-all duration-200 focus:border-[#a8721f]/60 focus:ring-4 focus:ring-[#a8721f]/15";
+  "w-full rounded-xl border border-[#1f1a14]/[0.16] bg-white px-4 py-2.5 text-[15px] text-[#1f1a14] placeholder-[#9a8f80] outline-none transition-all duration-200 focus:border-[#d9622b]/60 focus:ring-4 focus:ring-[#d9622b]/15";
 
 // Primary button: espresso ink on cream, soft lift, no glow
 export const buttonAccent =

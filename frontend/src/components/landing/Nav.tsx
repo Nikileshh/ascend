@@ -14,7 +14,7 @@ export function Nav() {
           href="/"
           className="flex items-center gap-2 text-lg font-semibold tracking-tight text-[#1f1a14]"
         >
-          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-[#a8721f] to-[#7d5a1e] text-[10px] text-white shadow-[0_0_14px_rgba(168,114,31,0.32)]">
+          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-gradient-to-br from-[#d9622b] to-[#b04d18] text-[10px] text-white shadow-[0_0_14px_rgba(217,98,43,0.32)]">
             ▲
           </span>
           Ascend

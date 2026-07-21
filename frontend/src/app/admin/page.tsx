@@ -71,7 +71,7 @@ function Toggle({
       disabled={busy}
       aria-pressed={on}
       className={`relative inline-flex h-[22px] w-[38px] items-center rounded-full transition-colors duration-200 disabled:opacity-50 ${
-        on ? "bg-[#a8721f]" : "bg-[#1f1a14]/15"
+        on ? "bg-[#d9622b]" : "bg-[#1f1a14]/15"
       }`}
       title={on ? "Premium — click to revoke" : "Free — click to grant premium"}
     >
@@ -141,7 +141,7 @@ function ContentEditor() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#a8721f]/25 bg-[#a8721f]/[0.06] px-5 py-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#d9622b]/25 bg-[#d9622b]/[0.06] px-5 py-3.5">
         <p className="text-[13px] text-[#6b6155]">
           Edit the wording shown on the landing page. Changes go live the moment
           you save — clear a field or press Reset to restore the original text.
@@ -180,7 +180,7 @@ function ContentEditor() {
                     <span className="text-[12px] font-medium tracking-wide text-[#6b6155] uppercase">
                       {f.label}
                       {edited && (
-                        <span className="ml-2 inline-block h-1.5 w-1.5 rounded-full bg-[#a8721f] align-middle" />
+                        <span className="ml-2 inline-block h-1.5 w-1.5 rounded-full bg-[#d9622b] align-middle" />
                       )}
                     </span>
                     {edited && (
@@ -189,7 +189,7 @@ function ContentEditor() {
                         onClick={() =>
                           setDraft((d) => ({ ...d, [f.key]: f.default }))
                         }
-                        className="text-[12px] text-[#9a8f80] underline-offset-2 hover:text-[#a8721f] hover:underline"
+                        className="text-[12px] text-[#9a8f80] underline-offset-2 hover:text-[#d9622b] hover:underline"
                       >
                         Reset
                       </button>
@@ -306,14 +306,14 @@ export default function AdminPage() {
     <main className="relative min-h-screen overflow-hidden bg-[#f4efe6] px-6 py-12 text-[#1f1a14]">
       {/* soft ambient wash */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="animate-blob absolute -top-44 left-[20%] h-[560px] w-[560px] rounded-full bg-[#a8721f]/[0.06] blur-[100px]" />
+        <div className="animate-blob absolute -top-44 left-[20%] h-[560px] w-[560px] rounded-full bg-[#d9622b]/[0.06] blur-[100px]" />
         <div className="animate-blob absolute -right-20 -bottom-56 h-[620px] w-[620px] rounded-full bg-[#e6c992]/[0.08] blur-[110px] [animation-delay:-7s]" />
       </div>
 
       <div className="relative mx-auto max-w-5xl space-y-6">
         <div className="animate-fade-up flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#a8721f] text-sm text-white">
+            <span className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#d9622b] text-sm text-white">
               ▲
             </span>
             <div>
@@ -369,7 +369,7 @@ export default function AdminPage() {
               key={label}
               className={`rounded-2xl border p-4 ${
                 highlight
-                  ? "border-[#a8721f]/40 bg-[#a8721f]/[0.07]"
+                  ? "border-[#d9622b]/40 bg-[#d9622b]/[0.07]"
                   : "border-[#1f1a14]/[0.09] bg-white/70 backdrop-blur-xl"
               }`}
             >
@@ -378,7 +378,7 @@ export default function AdminPage() {
               </p>
               <p
                 className={`mt-1 text-2xl font-semibold ${
-                  highlight && value > 0 ? "text-[#a8721f]" : "text-[#1f1a14]"
+                  highlight && value > 0 ? "text-[#d9622b]" : "text-[#1f1a14]"
                 }`}
               >
                 {value}
@@ -431,7 +431,7 @@ export default function AdminPage() {
                       <span
                         className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] capitalize ${
                           u.role === "admin"
-                            ? "border border-[#a8721f]/40 bg-[#a8721f]/12 text-[#7d5a1e]"
+                            ? "border border-[#d9622b]/40 bg-[#d9622b]/12 text-[#b04d18]"
                             : "border border-[#1f1a14]/10 bg-[#1f1a14]/[0.04] text-[#6b6155]"
                         }`}
                       >
@@ -457,7 +457,7 @@ export default function AdminPage() {
                           />
                           <span
                             className={`text-[12px] font-medium ${
-                              u.premium ? "text-[#a8721f]" : "text-[#9a8f80]"
+                              u.premium ? "text-[#d9622b]" : "text-[#9a8f80]"
                             }`}
                           >
                             {u.premium ? "Premium" : "Free"}
@@ -491,7 +491,7 @@ export default function AdminPage() {
                     {data.users.map((u) => (
                       <tr
                         key={u.id}
-                        className="border-b border-[#1f1a14]/[0.06] transition-colors last:border-0 hover:bg-[#a8721f]/[0.04]"
+                        className="border-b border-[#1f1a14]/[0.06] transition-colors last:border-0 hover:bg-[#d9622b]/[0.04]"
                       >
                         <td className="px-3 py-3 font-medium text-[#1f1a14]">
                           {u.name}
@@ -501,7 +501,7 @@ export default function AdminPage() {
                           <span
                             className={`rounded-full px-2.5 py-0.5 text-[11px] capitalize ${
                               u.role === "admin"
-                                ? "border border-[#a8721f]/40 bg-[#a8721f]/12 text-[#7d5a1e]"
+                                ? "border border-[#d9622b]/40 bg-[#d9622b]/12 text-[#b04d18]"
                                 : "border border-[#1f1a14]/10 bg-[#1f1a14]/[0.04] text-[#6b6155]"
                             }`}
                           >
@@ -523,7 +523,7 @@ export default function AdminPage() {
                               <span
                                 className={`text-[11px] ${
                                   u.premium
-                                    ? "text-[#a8721f]"
+                                    ? "text-[#d9622b]"
                                     : "text-[#9a8f80]"
                                 }`}
                               >
@@ -624,7 +624,7 @@ export default function AdminPage() {
                         <span
                           className={`rounded-full px-2.5 py-0.5 text-[11px] capitalize ${
                             p.status === "approved"
-                              ? "bg-[#a8721f]/12 text-[#7d5a1e]"
+                              ? "bg-[#d9622b]/12 text-[#b04d18]"
                               : "bg-[#b5551f]/10 text-[#b5551f]"
                           }`}
                         >
@@ -651,7 +651,7 @@ export default function AdminPage() {
                         {type.replace(/_/g, " ")}
                       </span>
                       <span
-                        className="h-2 rounded-full bg-gradient-to-r from-[#a8721f] to-[#e6c992]"
+                        className="h-2 rounded-full bg-gradient-to-r from-[#d9622b] to-[#e6c992]"
                         style={{
                           width: `${Math.max(4, (count / maxCount) * 60)}%`,
                         }}
@@ -673,7 +673,7 @@ export default function AdminPage() {
                     <span className="w-32 shrink-0 font-mono text-xs leading-5 text-[#9a8f80]">
                       {fmt(a.at)}
                     </span>
-                    <span className="w-28 shrink-0 font-medium text-[#7d5a1e] capitalize">
+                    <span className="w-28 shrink-0 font-medium text-[#b04d18] capitalize">
                       {a.type.replace(/_/g, " ")}
                     </span>
                     <span className="truncate text-[#6b6155]">

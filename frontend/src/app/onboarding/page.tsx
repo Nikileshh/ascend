@@ -155,8 +155,8 @@ export default function OnboardingPage() {
       <div className="animate-fade-up relative w-full max-w-xl rounded-[20px] border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 shadow-[0_20px_50px_-24px_rgba(70,50,20,0.22)]">
         {building ? (
           <div className="py-10 text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#a8721f]/25 bg-[#a8721f]/[0.08] px-4 py-1.5 font-mono text-xs font-medium tracking-[0.14em] text-[#a8721f] uppercase">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-[#a8721f]" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#d9622b]/25 bg-[#d9622b]/[0.08] px-4 py-1.5 font-mono text-xs font-medium tracking-[0.14em] text-[#d9622b] uppercase">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-[#d9622b]" />
               AI at work
             </span>
             <h1 className="font-display mt-5 text-[34px] leading-tight font-medium text-[#1f1a14]">
@@ -167,7 +167,7 @@ export default function OnboardingPage() {
               and habits. This takes about a minute.
             </p>
             <div className="mx-auto mt-7 h-1.5 w-56 overflow-hidden rounded-full bg-[#1f1a14]/[0.07]">
-              <div className="h-full w-1/2 animate-pulse rounded-full bg-gradient-to-r from-[#a8721f] to-[#e6c992]" />
+              <div className="h-full w-1/2 animate-pulse rounded-full bg-gradient-to-r from-[#d9622b] to-[#e6c992]" />
             </div>
           </div>
         ) : step === 0 ? (
@@ -199,7 +199,7 @@ export default function OnboardingPage() {
         ) : step <= questions.length ? (
           <div key={step} className="animate-fade-up">
             <div className="flex items-center justify-between">
-              <p className="font-mono text-xs font-medium tracking-[0.14em] text-[#a8721f] uppercase">
+              <p className="font-mono text-xs font-medium tracking-[0.14em] text-[#d9622b] uppercase">
                 Question {step} of {questions.length}
               </p>
               <div className="flex gap-1">
@@ -207,7 +207,7 @@ export default function OnboardingPage() {
                   <span
                     key={i}
                     className={`h-1 w-5 rounded-full ${
-                      i < step ? "bg-[#a8721f]" : "bg-[#1f1a14]/10"
+                      i < step ? "bg-[#d9622b]" : "bg-[#1f1a14]/10"
                     }`}
                   />
                 ))}
@@ -217,7 +217,7 @@ export default function OnboardingPage() {
               {q.question}
             </h1>
             {q.multi && (
-              <p className="mt-1.5 text-[12.5px] font-medium text-[#a8721f]">
+              <p className="mt-1.5 text-[12.5px] font-medium text-[#d9622b]">
                 Select all that apply
               </p>
             )}
@@ -244,8 +244,8 @@ export default function OnboardingPage() {
                         : "py-3"
                     } ${
                       active
-                        ? "border-[#a8721f] bg-[#a8721f]/10 font-medium text-[#7d5a1e] shadow-[0_0_0_1px_#a8721f]"
-                        : "border-[#1f1a14]/[0.12] bg-white text-[#4a4239] hover:border-[#a8721f]/50 hover:bg-[#faf6ee]"
+                        ? "border-[#d9622b] bg-[#d9622b]/10 font-medium text-[#b04d18] shadow-[0_0_0_1px_#d9622b]"
+                        : "border-[#1f1a14]/[0.12] bg-white text-[#4a4239] hover:border-[#d9622b]/50 hover:bg-[#faf6ee]"
                     }`}
                   >
                     {opt}
@@ -259,8 +259,8 @@ export default function OnboardingPage() {
                   q.type === "time" ? "py-2.5 text-center" : "py-3"
                 } ${
                   (selected[current] ?? []).includes(OTHER)
-                    ? "border-[#a8721f] bg-[#a8721f]/10 font-medium text-[#7d5a1e] shadow-[0_0_0_1px_#a8721f]"
-                    : "border-dashed border-[#1f1a14]/20 bg-transparent text-[#6b6155] hover:border-[#a8721f]/50"
+                    ? "border-[#d9622b] bg-[#d9622b]/10 font-medium text-[#b04d18] shadow-[0_0_0_1px_#d9622b]"
+                    : "border-dashed border-[#1f1a14]/20 bg-transparent text-[#6b6155] hover:border-[#d9622b]/50"
                 }`}
               >
                 Other…
@@ -305,7 +305,7 @@ export default function OnboardingPage() {
           </div>
         ) : (
           <div className="animate-fade-up">
-            <p className="font-mono text-xs font-medium tracking-[0.14em] text-[#a8721f] uppercase">
+            <p className="font-mono text-xs font-medium tracking-[0.14em] text-[#d9622b] uppercase">
               Last step
             </p>
             <h1 className="font-display mt-3 text-[28px] leading-snug font-medium text-[#1f1a14]">
@@ -327,14 +327,14 @@ export default function OnboardingPage() {
                     aria-pressed={on}
                     className={`flex items-start gap-3 rounded-xl border p-3.5 text-left transition-all duration-150 ${
                       on
-                        ? "border-[#a8721f] bg-[#a8721f]/[0.07] shadow-[0_0_0_1px_#a8721f]"
+                        ? "border-[#d9622b] bg-[#d9622b]/[0.07] shadow-[0_0_0_1px_#d9622b]"
                         : "border-[#1f1a14]/[0.12] bg-white opacity-70 hover:opacity-100"
                     }`}
                   >
                     <span
                       className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border text-[11px] ${
                         on
-                          ? "border-[#a8721f] bg-[#a8721f] text-white"
+                          ? "border-[#d9622b] bg-[#d9622b] text-white"
                           : "border-[#1f1a14]/20 bg-white text-transparent"
                       }`}
                     >

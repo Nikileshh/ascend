@@ -82,7 +82,7 @@ export function HowItWorks() {
           <h2 className="font-display text-4xl font-medium tracking-tight text-[#1f1a14] sm:text-6xl">
             You answer questions.
             <br />
-            <span className="bg-gradient-to-r from-[#c79a4a] to-[#a8721f] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[#c79a4a] to-[#d9622b] bg-clip-text text-transparent">
               The AI builds everything else.
             </span>
           </h2>
@@ -95,9 +95,9 @@ export function HowItWorks() {
           {steps.map((step) => (
             <div
               key={step.number}
-              className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 backdrop-blur-xl transition-colors hover:border-[#a8721f]/40"
+              className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
             >
-              <span className="font-mono text-sm font-semibold text-[#a8721f]">
+              <span className="font-mono text-sm font-semibold text-[#d9622b]">
                 {step.number}
               </span>
               <h3 className="mt-3 text-xl font-semibold text-[#1f1a14]">
@@ -111,14 +111,14 @@ export function HowItWorks() {
         </ScrollReveal>
 
         <ScrollReveal className="mt-5 grid gap-5 lg:grid-cols-2" stagger={0.15}>
-          <div className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-br from-[#a8721f]/10 via-white/[0.03] to-white/[0.03] p-8 backdrop-blur-xl">
+          <div className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-br from-[#d9622b]/10 via-white/[0.03] to-white/[0.03] p-8 backdrop-blur-xl">
             <p className="text-sm font-medium text-[#9a8f80]">
               Example roadmap · Build a ₹1 lakh/month agency
             </p>
             <ul className="mt-5 space-y-4">
               {roadmap.map((item) => (
                 <li key={item.month} className="flex gap-4">
-                  <span className="w-20 shrink-0 font-mono text-sm font-semibold text-[#a8721f]">
+                  <span className="w-20 shrink-0 font-mono text-sm font-semibold text-[#d9622b]">
                     {item.month}
                   </span>
                   <span className="text-sm text-[#4a4239]">{item.focus}</span>
@@ -159,7 +159,7 @@ export function HowItWorks() {
             {habitSets.map((set) => (
               <div
                 key={set.goal}
-                className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-6 backdrop-blur-xl transition-colors hover:border-[#a8721f]/40"
+                className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-6 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
               >
                 <p className="font-semibold text-[#1f1a14]">{set.goal}</p>
                 <ul className="mt-4 space-y-2">
@@ -168,7 +168,7 @@ export function HowItWorks() {
                       key={habit}
                       className="flex items-center gap-2 text-sm text-[#6b6155]"
                     >
-                      <span className="text-[#a8721f]">✓</span>
+                      <span className="text-[#d9622b]">✓</span>
                       {habit}
                     </li>
                   ))}

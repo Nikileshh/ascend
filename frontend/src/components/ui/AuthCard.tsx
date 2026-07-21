@@ -17,7 +17,7 @@ export function AuthCard({
 
       <div className="animate-fade-up relative w-full max-w-md rounded-[20px] border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 shadow-[0_20px_50px_-24px_rgba(70,50,20,0.22)]">
         <div className="mb-6 flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#a8721f] text-xs text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#d9622b] text-xs text-white">
             ▲
           </span>
           <span className="font-display text-xl font-medium tracking-[0.12em]">
@@ -35,7 +35,7 @@ export function AuthCard({
 }
 
 export const inputClass =
-  "w-full rounded-xl border border-[#1f1a14]/[0.16] bg-white px-4 py-2.5 text-sm text-[#1f1a14] placeholder-[#9a8f80] outline-none transition-all duration-200 focus:border-[#a8721f]/60 focus:ring-4 focus:ring-[#a8721f]/15";
+  "w-full rounded-xl border border-[#1f1a14]/[0.16] bg-white px-4 py-2.5 text-sm text-[#1f1a14] placeholder-[#9a8f80] outline-none transition-all duration-200 focus:border-[#d9622b]/60 focus:ring-4 focus:ring-[#d9622b]/15";
 
 export const buttonClass =
   "w-full rounded-full bg-gradient-to-b from-[#2a231b] to-[#1f1a14] px-6 py-2.5 text-sm font-medium text-[#f7f1e6] shadow-[0_8px_24px_rgba(31,26,20,0.24)] transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_12px_34px_rgba(31,26,20,0.32)] active:translate-y-0 disabled:opacity-50";
