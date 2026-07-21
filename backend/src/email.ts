@@ -39,6 +39,27 @@ export function notify(
   );
 }
 
+/**
+ * Like notify(), but for one-time codes (verification / password reset): if
+ * delivery fails (e.g. bad SMTP credentials), log the code to the server
+ * console so the account owner can still complete the flow and isn't blind to
+ * a broken mailer. Only whoever runs the server sees this.
+ */
+export function notifyCode(
+  to: string,
+  subject: string,
+  text: string,
+  html: string,
+  code: string,
+) {
+  sendMail(to, subject, text, html).catch((err) => {
+    console.error(`[email] failed to send "${subject}" to ${to}:`, err.message);
+    console.error(
+      `[email] ⚠️  EMAIL DELIVERY IS BROKEN — code for ${to} is: ${code}  (fix SMTP_PASS)`,
+    );
+  });
+}
+
 const signoff = "\n— Ascend, your AI goal coach";
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -157,7 +178,7 @@ export function sendVerificationEmail(
   email: string,
   code: string,
 ) {
-  notify(
+  notifyCode(
     email,
     `${code} is your Ascend verification code`,
     `Hi ${name},
@@ -184,6 +205,7 @@ If you didn't sign up for Ascend, you can ignore this email.${signoff}`,
           `<span style="color:${C.faint};">The code expires in 15 minutes. If you didn't sign up for Ascend, you can safely ignore this email.</span>`,
         ),
     }),
+    code,
   );
 }
 
@@ -192,7 +214,7 @@ export function sendPasswordResetEmail(
   email: string,
   code: string,
 ) {
-  notify(
+  notifyCode(
     email,
     `${code} is your Ascend password reset code`,
     `Hi ${name},
@@ -217,6 +239,7 @@ If you didn't request this, you can safely ignore this email — your password s
           `<span style="color:${C.faint};">The code expires in 15 minutes. If you didn't request a reset, ignore this email — your password stays unchanged.</span>`,
         ),
     }),
+    code,
   );
 }
 
