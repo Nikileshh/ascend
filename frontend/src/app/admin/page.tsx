@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, clearSession, getUser, type SessionUser } from "@/lib/api";
 import { GlassCard, buttonAccent, inputDark } from "@/components/ui/Glass";
+import { MountainBackdrop } from "@/components/ui/MountainBackdrop";
 import { COPY_SECTIONS, DEFAULT_COPY } from "@/lib/copy";
 
 interface AdminUser extends SessionUser {
@@ -304,11 +305,7 @@ export default function AdminPage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f4efe6] px-6 py-12 text-[#1f1a14]">
-      {/* soft ambient wash */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="animate-blob absolute -top-44 left-[20%] h-[560px] w-[560px] rounded-full bg-[#d9622b]/[0.06] blur-[100px]" />
-        <div className="animate-blob absolute -right-20 -bottom-56 h-[620px] w-[620px] rounded-full bg-[#e6c992]/[0.08] blur-[110px] [animation-delay:-7s]" />
-      </div>
+      <MountainBackdrop src="/desk-bg.jpg" center={0.93} edge={0.83} />
 
       <div className="relative mx-auto max-w-5xl space-y-6">
         <div className="animate-fade-up flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
