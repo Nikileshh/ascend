@@ -95,7 +95,7 @@ export function HowItWorks() {
           {steps.map((step) => (
             <div
               key={step.number}
-              className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
+              className="rounded-3xl border border-[#1f1a14]/[0.09] bg-white/60 p-8 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
             >
               <span className="font-mono text-sm font-semibold text-[#d9622b]">
                 {step.number}
@@ -127,7 +127,7 @@ export function HowItWorks() {
             </ul>
           </div>
 
-          <div className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 backdrop-blur-xl">
+          <div className="rounded-3xl border border-[#1f1a14]/[0.09] bg-white/60 p-8 backdrop-blur-xl">
             <p className="text-sm font-medium text-[#9a8f80]">
               Example timetable · Generated for your energy and commitments
             </p>
@@ -159,7 +159,7 @@ export function HowItWorks() {
             {habitSets.map((set) => (
               <div
                 key={set.goal}
-                className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-6 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
+                className="rounded-3xl border border-[#1f1a14]/[0.09] bg-white/60 p-6 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
               >
                 <p className="font-semibold text-[#1f1a14]">{set.goal}</p>
                 <ul className="mt-4 space-y-2">

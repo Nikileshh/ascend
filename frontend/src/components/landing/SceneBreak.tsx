@@ -11,9 +11,12 @@ import { useCopy } from "@/lib/useCopy";
 export function SceneBreak({
   headingKey,
   subKey,
+  image = "/dashboard-bg.jpg",
 }: {
   headingKey: string;
   subKey: string;
+  /** scene photo for this chapter break */
+  image?: string;
 }) {
   const copy = useCopy();
   return (
@@ -22,7 +25,7 @@ export function SceneBreak({
       <div
         aria-hidden
         className="absolute inset-0 bg-cover bg-center sm:bg-fixed"
-        style={{ backgroundImage: "url(/dashboard-bg.jpg)" }}
+        style={{ backgroundImage: `url(${image})` }}
       />
       <div
         aria-hidden

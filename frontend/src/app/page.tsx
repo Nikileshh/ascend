@@ -24,7 +24,11 @@ export default function Home() {
           <HowItWorks />
           <Features />
           <Audience />
-          <SceneBreak headingKey="scene2.heading" subKey="scene2.sub" />
+          <SceneBreak
+            headingKey="scene2.heading"
+            subKey="scene2.sub"
+            image="/road-bg.jpg"
+          />
           <Pricing />
         </div>
       </main>

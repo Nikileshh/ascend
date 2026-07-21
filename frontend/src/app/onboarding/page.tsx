@@ -150,9 +150,9 @@ export default function OnboardingPage() {
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f4efe6] px-6 py-10 text-[#1f1a14]">
-      <MountainBackdrop center={0.58} edge={0.25} />
+      <MountainBackdrop src="/road-bg.jpg" center={0.52} edge={0.2} />
 
-      <div className="animate-fade-up relative w-full max-w-xl rounded-[20px] border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 shadow-[0_20px_50px_-24px_rgba(70,50,20,0.22)]">
+      <div className="animate-fade-up relative w-full max-w-xl rounded-[20px] border border-[#1f1a14]/[0.09] bg-white/60 p-8 shadow-[0_20px_50px_-24px_rgba(70,50,20,0.22)] backdrop-blur-xl">
         {building ? (
           <div className="py-10 text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-[#d9622b]/25 bg-[#d9622b]/[0.08] px-4 py-1.5 font-mono text-xs font-medium tracking-[0.14em] text-[#d9622b] uppercase">

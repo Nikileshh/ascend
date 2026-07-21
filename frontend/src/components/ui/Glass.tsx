@@ -18,8 +18,8 @@ export function GlassCard({
   const base =
     "rounded-[20px] p-6 transition-all duration-[250ms] ease-out hover:-translate-y-0.5";
   const surface = gradient
-    ? "border border-[#c79a4a]/50 bg-gradient-to-b from-white to-[#fbf3e2] shadow-[0_0_40px_-12px_rgba(199,154,74,0.4)]"
-    : "border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] shadow-[0_20px_50px_-24px_rgba(70,50,20,0.22)]";
+    ? "border border-[#c79a4a]/50 bg-[#fbf3e2]/65 backdrop-blur-xl shadow-[0_0_40px_-12px_rgba(199,154,74,0.4)]"
+    : "border border-[#1f1a14]/[0.09] bg-white/60 backdrop-blur-xl shadow-[0_20px_50px_-24px_rgba(70,50,20,0.22)]";
   return (
     <section className={`${base} ${surface} ${className}`}>
       {(title || action) && (

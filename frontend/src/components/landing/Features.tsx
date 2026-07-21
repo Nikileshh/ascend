@@ -63,7 +63,7 @@ export function Features() {
         {scores.map((score) => (
           <div
             key={score.label}
-            className="rounded-2xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-6 text-center backdrop-blur-xl"
+            className="rounded-2xl border border-[#1f1a14]/[0.09] bg-white/60 p-6 text-center backdrop-blur-xl"
           >
             <p className="text-3xl font-semibold tracking-tight text-[#1f1a14]">
               {score.value}
@@ -80,7 +80,7 @@ export function Features() {
         {features.map((feature) => (
           <div
             key={feature.title}
-            className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
+            className="rounded-3xl border border-[#1f1a14]/[0.09] bg-white/60 p-8 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
           >
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#d9622b] to-[#b04d18] text-lg text-white shadow-[0_0_18px_rgba(217,98,43,0.3)]">
               {feature.icon}

@@ -1,13 +1,16 @@
-// Sunset-mountain backdrop (the Ascend summit photo) with a warm bone wash
-// so foreground text stays readable. Shared by the auth shell and onboarding;
-// the dashboard has its own animated variant.
+// Cinematic photo backdrop with a warm bone wash so foreground text stays
+// readable. Shared by the auth shell and onboarding (each page picks its own
+// scene via `src`); the dashboard has its own animated variant.
 export function MountainBackdrop({
+  src = "/dashboard-bg.jpg",
   center = 0.86,
   edge = 0.6,
 }: {
+  /** which scene photo to show behind the page */
+  src?: string;
   /** wash opacity where content sits (higher = more readable, less photo) */
   center?: number;
-  /** wash opacity at the edges (lower = peaks more visible) */
+  /** wash opacity at the edges (lower = photo more visible) */
   edge?: number;
 }) {
   return (
@@ -16,11 +19,7 @@ export function MountainBackdrop({
       className="pointer-events-none absolute inset-0 overflow-hidden"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/dashboard-bg.jpg"
-        alt=""
-        className="h-full w-full object-cover"
-      />
+      <img src={src} alt="" className="h-full w-full object-cover" />
       <div
         className="absolute inset-0"
         style={{
