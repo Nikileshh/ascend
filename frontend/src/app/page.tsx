@@ -16,29 +16,46 @@ export default function Home() {
       <Nav />
       <main id="main-content">
         <Hero />
-        {/* Below the hero, the page warms into the sunset tones of the
-            summit photo (bone → peach → gold-tinted → bone). */}
-        <div className="bg-[linear-gradient(180deg,#f4efe6_0%,#f8ecd8_30%,#f6e3c9_65%,#f4efe6_100%)]">
-          <Problem />
-          <SceneBreak
-            headingKey="scene1.heading"
-            subKey="scene1.sub"
-            image="/desk-bg.jpg"
+        {/* Below the hero, the summit photo sits fixed behind everything
+            under a warm veil — so the frosted-glass cards genuinely blur
+            imagery, and scrolling feels layered (the scene breaks land on
+            top of it at full strength). */}
+        <div className="relative">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-cover bg-center sm:bg-fixed"
+            style={{ backgroundImage: "url(/dashboard-bg.jpg)" }}
           />
-          <HowItWorks />
-          <SceneBreak
-            headingKey="scene3.heading"
-            subKey="scene3.sub"
-            image="/mist-bg.jpg"
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(244,239,230,0.94) 0%, rgba(248,236,216,0.86) 30%, rgba(246,227,201,0.82) 65%, rgba(244,239,230,0.92) 100%)",
+            }}
           />
-          <Features />
-          <Audience />
-          <SceneBreak
-            headingKey="scene2.heading"
-            subKey="scene2.sub"
-            image="/road-bg.jpg"
-          />
-          <Pricing />
+          <div className="relative">
+            <Problem />
+            <SceneBreak
+              headingKey="scene1.heading"
+              subKey="scene1.sub"
+              image="/desk-bg.jpg"
+            />
+            <HowItWorks />
+            <SceneBreak
+              headingKey="scene3.heading"
+              subKey="scene3.sub"
+              image="/mist-bg.jpg"
+            />
+            <Features />
+            <Audience />
+            <SceneBreak
+              headingKey="scene2.heading"
+              subKey="scene2.sub"
+              image="/road-bg.jpg"
+            />
+            <Pricing />
+          </div>
         </div>
       </main>
       <Footer />

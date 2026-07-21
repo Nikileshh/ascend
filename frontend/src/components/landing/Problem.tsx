@@ -43,7 +43,7 @@ export function Problem() {
         {dreams.map((dream) => (
           <span
             key={dream}
-            className="rounded-full border border-[#1f1a14]/[0.09] bg-white px-4 py-1.5 text-sm text-[#4a4239] backdrop-blur"
+            className="rounded-full border border-[#1f1a14]/[0.09] bg-white/55 px-4 py-1.5 text-sm text-[#4a4239] backdrop-blur-xl"
           >
             {dream}
           </span>

@@ -14,7 +14,7 @@ const audiences = [
 
 export function Audience() {
   return (
-    <section className="border-y border-[#1f1a14]/[0.08] bg-[#f8ecd8]/45">
+    <section className="border-y border-[#1f1a14]/[0.08] bg-[#f8ecd8]/35 backdrop-blur-md">
       <div className="mx-auto w-full max-w-6xl px-6 py-28 text-center">
         <ScrollReveal>
           <h2 className="font-display text-4xl font-medium tracking-tight text-[#1f1a14] sm:text-6xl">
@@ -29,7 +29,7 @@ export function Audience() {
           {audiences.map((audience) => (
             <span
               key={audience}
-              className="rounded-full border border-[#1f1a14]/[0.09] bg-white px-5 py-2 text-sm font-medium text-[#4a4239] backdrop-blur transition-colors hover:border-[#d9622b]/50 hover:text-[#1f1a14]"
+              className="rounded-full border border-[#1f1a14]/[0.09] bg-white/55 px-5 py-2 text-sm font-medium text-[#4a4239] backdrop-blur-xl transition-colors hover:border-[#d9622b]/50 hover:text-[#1f1a14]"
             >
               {audience}
             </span>
