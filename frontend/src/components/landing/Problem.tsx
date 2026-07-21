@@ -43,7 +43,7 @@ export function Problem() {
         {dreams.map((dream) => (
           <span
             key={dream}
-            className="rounded-full border border-[#1f1a14]/[0.09] bg-white/55 px-4 py-1.5 text-sm text-[#4a4239] backdrop-blur-xl"
+            className="rounded-full border border-[#1f1a14]/[0.09] bg-white/70 px-4 py-1.5 text-sm text-[#4a4239] backdrop-blur-xl"
           >
             {dream}
           </span>
@@ -57,7 +57,7 @@ export function Problem() {
         {blockers.map((blocker) => (
           <div
             key={blocker}
-            className="rounded-2xl border border-[#1f1a14]/[0.09] bg-white/60 p-6 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
+            className="rounded-2xl border border-[#1f1a14]/[0.09] bg-white/70 p-6 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
           >
             <p className="text-sm font-medium text-[#9a8f80]">
               They don&apos;t know

@@ -75,7 +75,7 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="border-y border-[#1f1a14]/[0.08] bg-[#f8ecd8]/35 backdrop-blur-md"
+      className="border-y border-[#1f1a14]/[0.08] bg-[#f8ecd8]/30 backdrop-blur-md"
     >
       <div className="mx-auto w-full max-w-6xl px-6 py-28">
         <ScrollReveal className="mx-auto max-w-2xl text-center">
@@ -95,7 +95,7 @@ export function HowItWorks() {
           {steps.map((step) => (
             <div
               key={step.number}
-              className="rounded-3xl border border-[#1f1a14]/[0.09] bg-white/60 p-8 backdrop-blur-xl transition-colors hover:border-[#d9622b]/40"
+              className="rounded-3xl border border-[#1f1a14]/[0.09] bg-white/70 p-8 backdrop-blur-xl transition-colors hover:border-[#d9622b]/50"
             >
               <span className="font-mono text-sm font-semibold text-[#d9622b]">
                 {step.number}
@@ -111,7 +111,7 @@ export function HowItWorks() {
         </ScrollReveal>
 
         <ScrollReveal className="mt-5 grid gap-5 lg:grid-cols-2" stagger={0.15}>
-          <div className="rounded-3xl border border-[#1f1a14]/[0.09] bg-gradient-to-br from-[#d9622b]/10 via-white/[0.03] to-white/[0.03] p-8 backdrop-blur-xl">
+          <div className="rounded-3xl border border-[#1f1a14]/[0.09] bg-white/70 p-8 backdrop-blur-xl">
             <p className="text-sm font-medium text-[#9a8f80]">
               Example roadmap · Build a ₹1 lakh/month agency
             </p>
@@ -127,7 +127,7 @@ export function HowItWorks() {
             </ul>
           </div>
 
-          <div className="rounded-3xl border border-[#1f1a14]/[0.09] bg-white/60 p-8 backdrop-blur-xl">
+          <div className="rounded-3xl border border-[#1f1a14]/[0.09] bg-white/70 p-8 backdrop-blur-xl">
             <p className="text-sm font-medium text-[#9a8f80]">
               Example timetable · Generated for your energy and commitments
             </p>

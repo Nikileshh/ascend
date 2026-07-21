@@ -193,7 +193,7 @@ export default function DashboardLayout({
         <img
           src="/dashboard-bg.jpg"
           alt=""
-          className="animate-ken-burns h-full w-full object-cover opacity-[0.9]"
+          className="animate-ken-burns h-full w-full object-cover opacity-[0.7]"
         />
         {/* radial white overlay: strongest in the center (where content sits),
             lighter at the edges so the peaks stay clearly visible */}
@@ -201,7 +201,7 @@ export default function DashboardLayout({
           className="absolute inset-0"
           style={{
             background:
-              "radial-gradient(130% 120% at 50% 35%, rgba(244,239,230,0.76) 42%, rgba(244,239,230,0.42) 100%)",
+              "radial-gradient(130% 120% at 50% 35%, rgba(245,242,236,0.9) 42%, rgba(245,242,236,0.7) 100%)",
           }}
         />
         {/* whisper-soft indigo ambience */}

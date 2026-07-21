@@ -1,16 +1,17 @@
-// Cinematic photo backdrop with a warm bone wash so foreground text stays
-// readable. Shared by the auth shell and onboarding (each page picks its own
-// scene via `src`); the dashboard has its own animated variant.
+// Cinematic photo backdrop kept faint under an opaque light veil, so the scene
+// reads as a subtle texture and foreground text stays crisp. Shared by the auth
+// shell and onboarding (each picks its scene via `src`); the dashboard has its
+// own animated variant.
 export function MountainBackdrop({
   src = "/dashboard-bg.jpg",
-  center = 0.86,
-  edge = 0.6,
+  center = 0.93,
+  edge = 0.82,
 }: {
   /** which scene photo to show behind the page */
   src?: string;
-  /** wash opacity where content sits (higher = more readable, less photo) */
+  /** light-veil opacity where content sits (higher = fainter photo) */
   center?: number;
-  /** wash opacity at the edges (lower = photo more visible) */
+  /** light-veil opacity at the edges (lower = photo a touch more visible) */
   edge?: number;
 }) {
   return (
@@ -23,15 +24,7 @@ export function MountainBackdrop({
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(130% 120% at 50% 38%, rgba(244,239,230,${center}) 45%, rgba(244,239,230,${edge}) 100%)`,
-        }}
-      />
-      {/* cinematic vignette: a whisper of darkness in the corners */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(120% 100% at 50% 45%, transparent 62%, rgba(31,26,20,0.16) 100%)",
+          background: `radial-gradient(130% 120% at 50% 38%, rgba(245,242,236,${center}) 45%, rgba(245,242,236,${edge}) 100%)`,
         }}
       />
     </div>

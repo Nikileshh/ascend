@@ -33,7 +33,7 @@ function VeiledScene({
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(180deg, rgba(244,239,230,0.95) 0%, rgba(246,235,216,0.86) 50%, rgba(244,239,230,0.93) 100%)",
+            "linear-gradient(180deg, rgba(245,242,236,0.95) 0%, rgba(245,242,236,0.9) 50%, rgba(245,242,236,0.95) 100%)",
         }}
       />
       <div className="relative">{children}</div>

@@ -13,7 +13,7 @@ export function AuthCard({
 }) {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f4efe6] px-6 text-[#1f1a14]">
-      <MountainBackdrop src="/desk-bg.jpg" center={0.5} edge={0.2} />
+      <MountainBackdrop src="/desk-bg.jpg" center={0.92} edge={0.8} />
 
       <div className="animate-fade-up relative w-full max-w-md rounded-[20px] border border-[#1f1a14]/[0.09] bg-white/60 p-8 shadow-[0_20px_50px_-24px_rgba(70,50,20,0.22)] backdrop-blur-xl">
         <div className="mb-6 flex items-center gap-2.5">
