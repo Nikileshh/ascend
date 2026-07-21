@@ -1,5 +1,7 @@
+import { MountainBackdrop } from "./MountainBackdrop";
+
 // Warm editorial auth shell (Ascend design system: bone canvas, espresso ink,
-// amber accent, Cormorant serif).
+// amber accent, Cormorant serif) over the sunset-mountain backdrop.
 export function AuthCard({
   title,
   subtitle,
@@ -11,11 +13,7 @@ export function AuthCard({
 }) {
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#f4efe6] px-6 text-[#1f1a14]">
-      {/* ambient warm wash */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="animate-blob absolute -top-44 left-[20%] h-[560px] w-[560px] rounded-full bg-[#a8721f]/[0.08] blur-[80px]" />
-        <div className="animate-blob absolute -right-20 -bottom-56 h-[620px] w-[620px] rounded-full bg-[#e6c992]/12 blur-[90px] [animation-delay:-7s]" />
-      </div>
+      <MountainBackdrop center={0.8} edge={0.45} />
 
       <div className="animate-fade-up relative w-full max-w-md rounded-[20px] border border-[#1f1a14]/[0.09] bg-gradient-to-b from-white to-[#faf6ee] p-8 shadow-[0_20px_50px_-24px_rgba(70,50,20,0.22)]">
         <div className="mb-6 flex items-center gap-2.5">

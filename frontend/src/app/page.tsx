@@ -15,11 +15,15 @@ export default function Home() {
       <Nav />
       <main id="main-content">
         <Hero />
-        <Problem />
-        <HowItWorks />
-        <Features />
-        <Audience />
-        <Pricing />
+        {/* Below the hero, the page warms into the sunset tones of the
+            summit photo (bone → peach → gold-tinted → bone). */}
+        <div className="bg-[linear-gradient(180deg,#f4efe6_0%,#f8ecd8_30%,#f6e3c9_65%,#f4efe6_100%)]">
+          <Problem />
+          <HowItWorks />
+          <Features />
+          <Audience />
+          <Pricing />
+        </div>
       </main>
       <Footer />
     </div>

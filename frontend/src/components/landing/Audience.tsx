@@ -14,7 +14,7 @@ const audiences = [
 
 export function Audience() {
   return (
-    <section className="border-y border-[#1f1a14]/[0.08] bg-[#faf6ee]">
+    <section className="border-y border-[#1f1a14]/[0.08] bg-[#f8ecd8]/45">
       <div className="mx-auto w-full max-w-6xl px-6 py-28 text-center">
         <ScrollReveal>
           <h2 className="font-display text-4xl font-medium tracking-tight text-[#1f1a14] sm:text-6xl">

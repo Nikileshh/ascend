@@ -75,7 +75,7 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="border-y border-[#1f1a14]/[0.08] bg-[#faf6ee]"
+      className="border-y border-[#1f1a14]/[0.08] bg-[#f8ecd8]/45"
     >
       <div className="mx-auto w-full max-w-6xl px-6 py-28">
         <ScrollReveal className="mx-auto max-w-2xl text-center">

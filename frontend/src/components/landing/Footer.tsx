@@ -9,20 +9,26 @@ export function Footer() {
     <footer className="border-t border-[#1f1a14]/[0.08]">
       <div className="mx-auto w-full max-w-6xl px-6 py-16">
         <ScrollReveal>
-          <div className="relative overflow-hidden rounded-3xl border border-[#a8721f]/30 bg-gradient-to-br from-[#a8721f]/25 via-[#7d5a1e]/15 to-transparent px-8 py-16 text-center backdrop-blur-xl">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute -top-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-[#a8721f]/30 blur-[80px]"
-            />
-            <h2 className="font-display relative text-4xl font-medium tracking-tight text-[#1f1a14] sm:text-5xl">
+          {/* Cinematic closing shot: the summit at dusk */}
+          <div className="relative overflow-hidden rounded-3xl border border-[#a8721f]/30 px-8 py-20 text-center">
+            <div aria-hidden className="pointer-events-none absolute inset-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/dashboard-bg.jpg"
+                alt=""
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/25" />
+            </div>
+            <h2 className="font-display relative text-4xl font-medium tracking-tight text-[#f7f1e6] sm:text-5xl">
               {copy["footer.heading"]}
             </h2>
-            <p className="relative mx-auto mt-4 max-w-xl text-lg leading-8 text-[#4a4239]">
+            <p className="relative mx-auto mt-4 max-w-xl text-lg leading-8 text-[#e8e0d3]">
               {copy["footer.sub"]}
             </p>
             <a
               href="/register"
-              className="relative mt-8 inline-block rounded-full bg-white px-8 py-3 text-base font-medium text-[#1f1a14] transition-transform hover:scale-[1.04] active:scale-[0.97]"
+              className="relative mt-8 inline-block rounded-full bg-gradient-to-b from-[#f2e4c8] to-[#e6c992] px-8 py-3 text-base font-medium text-[#1f1a14] shadow-[0_8px_28px_rgba(199,154,74,0.4)] transition-transform hover:scale-[1.04] active:scale-[0.97]"
             >
               {copy["footer.cta"]}
             </a>
