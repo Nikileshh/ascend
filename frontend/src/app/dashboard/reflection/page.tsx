@@ -42,7 +42,7 @@ export default function ReflectionPage() {
         Weekly reflection
       </h1>
       <p className="mt-2 text-[16px] text-[#6b6155]">
-        Write freely — your coach reads this and adjusts next week&apos;s plan
+        Write freely. Your coach reads this and adjusts next week&apos;s plan
         for you.
       </p>
 
@@ -77,7 +77,7 @@ export default function ReflectionPage() {
                 <textarea
                   required
                   rows={3}
-                  placeholder="Take your time — the more honest you are, the better the suggestions."
+                  placeholder="Take your time. The more honest you are, the better the suggestions."
                   value={reflection[key]}
                   onChange={(e) =>
                     setReflection({ ...reflection, [key]: e.target.value })

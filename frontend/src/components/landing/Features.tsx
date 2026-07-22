@@ -4,19 +4,19 @@ const features = [
   {
     title: "Dynamic Adaptation",
     description:
-      "Skipped three days? Ascend never punishes you. It analyzes what happened, recalculates, generates a new roadmap, and adjusts your schedule — keeping you motivated instead of guilty.",
+      "Skipped three days? Ascend never punishes you. It analyzes what happened, recalculates, generates a new roadmap, and adjusts your schedule, keeping you motivated instead of guilty.",
     icon: "↻",
   },
   {
     title: "Command Center Dashboard",
     description:
-      "Today's mission, priority tasks, habits, deep work timer, goal progress, streaks, countdown, and AI insights — everything in one calm view.",
+      "Today's mission, priority tasks, habits, deep work timer, goal progress, streaks, countdown, and AI insights, all in one calm view.",
     icon: "▦",
   },
   {
     title: "Analytics That Matter",
     description:
-      "Habit completion, deep work hours, consistency, focus trends, mood, sleep, and energy — everything becomes visual, so you always know if you're on track.",
+      "Habit completion, deep work hours, consistency, focus trends, mood, sleep, and energy all become visual, so you always know if you're on track.",
     icon: "◔",
   },
   {
@@ -34,7 +34,7 @@ const features = [
   {
     title: "Daily AI Coach",
     description:
-      "Every morning, your coach tells you what to do today, why it matters, and what your highest-impact task is. No decisions to make — just begin.",
+      "Every morning, your coach tells you what to do today, why it matters, and what your highest-impact task is. No decisions to make. Just begin.",
     icon: "✦",
   },
 ];

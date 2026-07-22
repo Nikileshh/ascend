@@ -25,7 +25,7 @@ interface BillingInfo {
 
 const PERKS = [
   "Unlimited goal analyses & re-plans",
-  "Every AI coach section — briefing, insights, chat",
+  "Every AI coach section: briefing, insights, chat",
   "Adaptive roadmap with weekly breakdowns",
   "Daily plan emails & task-start reminders",
   "Priority access to new features",
@@ -103,7 +103,7 @@ export default function UpgradePage() {
           {info?.premium
             ? "Your account has full access to every Ascend feature. Thank you for supporting the climb."
             : locked
-              ? `Subscribe for ₹${info?.price ?? 250}/month to continue. Your goal, roadmap, habits and progress are all saved — you pick up exactly where you left off.`
+              ? `Subscribe for ₹${info?.price ?? 250}/month to continue. Your goal, roadmap, habits and progress are all saved, so you pick up exactly where you left off.`
               : `Everything Ascend can do, for ₹${info?.price ?? 250}/month.`}
         </p>
       </header>
@@ -113,8 +113,8 @@ export default function UpgradePage() {
           <span className="text-lg">🔒</span>
           <p className="text-[14px] leading-6 text-[#4a4239]">
             Your 7-day free trial is over, so the dashboard is locked. Nothing
-            is deleted — the moment your payment is confirmed, your full plan
-            and streaks come right back.
+            is deleted. The moment your payment is confirmed, your full plan and
+            streaks come right back.
           </p>
         </div>
       )}
@@ -162,14 +162,14 @@ export default function UpgradePage() {
             {info?.pending ? (
               <div className="rounded-2xl border border-[#d9622b]/30 bg-[#d9622b]/[0.07] p-5 text-center">
                 <p className="text-[15px] font-medium text-[#b04d18]">
-                  Payment received — awaiting review
+                  Payment received, awaiting review
                 </p>
                 <p className="mt-1.5 text-[13px] text-[#6b6155]">
                   We got your reference{" "}
                   <span className="font-mono text-[#1f1a14]">
                     {info.pending.upiRef}
                   </span>
-                  . Your Premium activates as soon as an admin confirms it —
+                  . Your Premium activates as soon as an admin confirms it,
                   usually within a few hours. You&apos;ll get an email.
                 </p>
               </div>
@@ -186,7 +186,7 @@ export default function UpgradePage() {
                   </li>
                   <li>
                     <span className="font-medium text-[#1f1a14]">3.</span> Paste
-                    it below — we verify &amp; unlock Premium.
+                    it below, and we verify &amp; unlock Premium.
                   </li>
                 </ol>
 
@@ -243,7 +243,7 @@ export default function UpgradePage() {
                     disabled={busy}
                     className={`${buttonAccent} w-full`}
                   >
-                    {busy ? "Submitting…" : "I've paid — unlock Premium"}
+                    {busy ? "Submitting…" : "I've paid, unlock Premium"}
                   </button>
                 </div>
               </>

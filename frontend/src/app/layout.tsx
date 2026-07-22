@@ -20,7 +20,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  title: "Ascend — Turn your goals into a personalized execution system",
+  title: "Ascend: Turn your goals into a personalized execution system",
   description:
     "Ascend is your AI execution coach: personalized roadmaps, daily schedules, and habits that adapt until you reach your goal.",
 };

@@ -84,7 +84,7 @@ export default function TimetablePage() {
           </h1>
           <p className="mt-2 text-[16px] text-[#6b6155]">
             Couldn&apos;t finish a task, or life changed? Rearrange it your way
-            — reminders follow whatever you set here.
+            reminders follow whatever you set here.
           </p>
         </div>
         {!editing && (

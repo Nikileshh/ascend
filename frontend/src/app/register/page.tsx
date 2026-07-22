@@ -115,7 +115,7 @@ export default function RegisterPage() {
   return (
     <AuthCard
       title="Start your 7-day free trial"
-      subtitle="Sign up with your Gmail — we'll send a code to verify it's really you."
+      subtitle="Sign up with your Gmail and we'll send a code to verify it's really you."
     >
       <form onSubmit={onSubmit} className="space-y-4">
         <input

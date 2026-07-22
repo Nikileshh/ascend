@@ -94,6 +94,8 @@ export default function DashboardLayout({
   const name = user?.name ?? "";
   const premium = !!user && (!!user.premium || user.role === "admin");
   const daysLeft = user?.daysLeft ?? 0;
+  const aiLeft = user?.aiRemaining ?? 0;
+  const aiLimit = user?.aiLimit ?? 10;
   // Locked = a non-premium user whose 7-day trial has ended. They may only see
   // the upgrade page (to pay); everything else redirects there.
   const locked = !!user && !premium && !!user.trialExpired;
@@ -252,7 +254,9 @@ export default function DashboardLayout({
                     : `${daysLeft} days left in trial`}
               </p>
               <p className="mt-0.5 text-[11.5px] text-white/80">
-                {locked ? "Subscribe to continue" : "Upgrade to keep access"}
+                {locked
+                  ? "Subscribe to continue"
+                  : `${aiLeft} of ${aiLimit} AI actions left today · Upgrade`}
               </p>
             </Link>
           )}
@@ -352,7 +356,7 @@ export default function DashboardLayout({
                   className="rounded-full bg-gradient-to-br from-[#d9622b] to-[#b04d18] px-3.5 py-1 text-xs font-medium text-white"
                   onClick={() => setReminder(null)}
                 >
-                  Can&apos;t now — adjust
+                  Can&apos;t now? Adjust
                 </Link>
                 <button
                   onClick={() => setReminder(null)}
@@ -370,7 +374,7 @@ export default function DashboardLayout({
         {locked && pathname !== "/dashboard/upgrade" ? (
           <div className="flex min-h-[60vh] items-center justify-center">
             <p className="animate-pulse text-sm text-[#6b6155]">
-              Your free trial has ended — taking you to upgrade…
+              Your free trial has ended. Taking you to upgrade…
             </p>
           </div>
         ) : (

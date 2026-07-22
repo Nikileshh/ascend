@@ -71,6 +71,44 @@ export function Pricing() {
           </a>
         </div>
       </ScrollReveal>
+
+      {/* Free trial vs Premium — what each gives you */}
+      <ScrollReveal
+        className="mx-auto mt-8 grid max-w-lg gap-4 sm:grid-cols-2"
+        stagger={0.08}
+      >
+        <div className="rounded-2xl border border-[#1f1a14]/[0.1] bg-white/70 p-6 backdrop-blur-xl">
+          <p className="text-[15px] font-semibold text-[#1f1a14]">Free trial</p>
+          <p className="mt-0.5 text-xs text-[#9a8f80]">7 days, no card</p>
+          <ul className="mt-4 space-y-2.5 text-[13.5px] text-[#4a4239]">
+            <li className="flex gap-2">
+              <span className="text-[#d9622b]">✓</span> Every feature unlocked
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[#d9622b]">✓</span> 10 AI actions a day
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[#9a8f80]">·</span> Locks after 7 days
+            </li>
+          </ul>
+        </div>
+        <div className="rounded-2xl border border-[#d9622b]/40 bg-[#d9622b]/[0.06] p-6 backdrop-blur-xl">
+          <p className="text-[15px] font-semibold text-[#1f1a14]">Premium ✦</p>
+          <p className="mt-0.5 text-xs text-[#b04d18]">₹250 / month</p>
+          <ul className="mt-4 space-y-2.5 text-[13.5px] text-[#4a4239]">
+            <li className="flex gap-2">
+              <span className="text-[#d9622b]">✓</span> Everything in the trial
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[#d9622b]">✓</span> Unlimited AI, every day
+            </li>
+            <li className="flex gap-2">
+              <span className="text-[#d9622b]">✓</span> Yours as long as you
+              subscribe
+            </li>
+          </ul>
+        </div>
+      </ScrollReveal>
     </section>
   );
 }

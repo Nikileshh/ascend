@@ -62,8 +62,8 @@ export function HabitTracker({
             Today&apos;s productivity score
           </p>
           <p className="mt-1 text-xs text-[#6b6155]">
-            Click a cell to mark a habit — gold = done, red = missed, click
-            again to clear.
+            Click a cell to mark a habit. Gold = done, red = missed, click again
+            to clear.
           </p>
         </div>
       </div>

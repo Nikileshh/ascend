@@ -49,13 +49,13 @@ const steps = [
     number: "01",
     title: "Ascend gets to know you",
     description:
-      "No blank planner. A structured interview learns your goal, timeline, current level, daily schedule, energy patterns, and lifestyle — you just answer questions.",
+      "No blank planner. A structured interview learns your goal, timeline, current level, daily schedule, energy patterns, and lifestyle. You just answer questions.",
   },
   {
     number: "02",
     title: "AI analyzes everything",
     description:
-      "It estimates goal difficulty, required skills, weekly effort, success probability, risk factors, and bottlenecks — then designs the system to get you there.",
+      "It estimates goal difficulty, required skills, weekly effort, success probability, risk factors, and bottlenecks, then designs the system to get you there.",
   },
   {
     number: "03",
@@ -67,7 +67,7 @@ const steps = [
     number: "04",
     title: "A realistic daily timetable",
     description:
-      "Built around your energy levels, existing commitments, deep work blocks, and recovery — not a fantasy schedule you abandon by Wednesday.",
+      "Built around your energy levels, existing commitments, deep work blocks, and recovery, not a fantasy schedule you abandon by Wednesday.",
   },
 ];
 
@@ -149,7 +149,7 @@ export function HowItWorks() {
         <div className="mt-20">
           <ScrollReveal className="mx-auto max-w-2xl text-center">
             <h3 className="font-display text-3xl font-medium tracking-tight text-[#1f1a14] sm:text-4xl">
-              Habits built for your goal — not generic checklists
+              Habits built for your goal, not generic checklists
             </h3>
           </ScrollReveal>
           <ScrollReveal

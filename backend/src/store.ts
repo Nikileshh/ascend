@@ -59,6 +59,8 @@ export interface User {
   memory?: UserMemory;
   // Dashboard modules the user opted into at onboarding (absent = all).
   modules?: string[];
+  // Trial users get a daily cap on heavy AI actions; premium is unlimited.
+  aiUsage?: { date: string; count: number };
   // one AI call per day per section — cached to conserve API quota
   briefingCache?: { date: string; text: string };
   insightsCache?: { date: string; analytics: string; motivation: string };

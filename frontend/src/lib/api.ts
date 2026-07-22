@@ -14,6 +14,10 @@ export interface SessionUser {
   premiumSince?: string;
   // Dashboard modules chosen at onboarding (absent = all)
   modules?: string[];
+  // Daily AI-action allowance (trial users); premium is unlimited
+  unlimitedAi?: boolean;
+  aiLimit?: number;
+  aiRemaining?: number;
 }
 
 export function getToken() {

@@ -56,7 +56,7 @@ export default function ChatPage() {
         Ask your coach
       </h1>
       <p className="mt-2 text-[16px] text-[#6b6155]">
-        Doubts, blockers, questions about your plan — your coach knows your goal
+        Doubts, blockers, questions about your plan. Your coach knows your goal
         and progress.
       </p>
 

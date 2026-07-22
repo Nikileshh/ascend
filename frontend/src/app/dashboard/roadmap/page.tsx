@@ -16,7 +16,7 @@ export default function RoadmapPage() {
         Roadmap
       </h1>
       <p className="mt-2 text-[16px] text-[#6b6155]">
-        Your path to “{plan.goal}”, month by month — and week by week.
+        Your path to “{plan.goal}”, month by month, and week by week.
       </p>
 
       <div className="relative mt-7 flex flex-col gap-4">

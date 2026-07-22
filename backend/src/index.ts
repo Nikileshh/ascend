@@ -23,6 +23,7 @@ import {
   publicUser,
   requireActiveAccess,
   requireAdmin,
+  requireAiQuota,
   requireAuth,
   signToken,
   type AuthedRequest,
@@ -264,6 +265,7 @@ app.post(
   "/agents/questions",
   requireAuth,
   requireActiveAccess,
+  requireAiQuota,
   async (req: AuthedRequest, res) => {
     const { goal } = req.body ?? {};
     if (!goal) return res.status(400).json({ error: "goal required" });
@@ -279,6 +281,7 @@ app.post(
   "/agents/orchestrate",
   requireAuth,
   requireActiveAccess,
+  requireAiQuota,
   async (req: AuthedRequest, res) => {
     const user = req.user!;
     const { goal, qa } = req.body ?? {};
@@ -438,6 +441,7 @@ app.post(
   "/agents/chat",
   requireAuth,
   requireActiveAccess,
+  requireAiQuota,
   async (req: AuthedRequest, res) => {
     const user = req.user!;
     const { message } = req.body ?? {};
@@ -576,6 +580,7 @@ app.post(
   "/agents/reflection",
   requireAuth,
   requireActiveAccess,
+  requireAiQuota,
   async (req: AuthedRequest, res) => {
     const user = req.user!;
     const { win, distraction, lesson } = req.body ?? {};

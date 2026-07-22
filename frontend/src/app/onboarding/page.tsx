@@ -47,7 +47,7 @@ const MODULES = [
   {
     key: "reflection",
     name: "Reflection",
-    desc: "Weekly review — your coach adjusts the plan",
+    desc: "Weekly review, and your coach adjusts the plan",
     icon: "✍️",
   },
   {
@@ -176,8 +176,8 @@ export default function OnboardingPage() {
               What do you want to achieve?
             </h1>
             <p className="mt-1.5 text-sm leading-6 text-[#6b6155]">
-              Your AI coach will ask a few questions tailored to your goal —
-              most are one tap to answer.
+              Your AI coach will ask a few questions tailored to your goal, most
+              are one tap to answer.
             </p>
             <textarea
               required
@@ -312,7 +312,7 @@ export default function OnboardingPage() {
               Which modules do you want?
             </h1>
             <p className="mt-1.5 text-sm leading-6 text-[#6b6155]">
-              Your dashboard shows only what you pick — the Overview is always
+              Your dashboard shows only what you pick. The Overview is always
               included. You can start a new goal anytime to change these.
             </p>
 

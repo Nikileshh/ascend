@@ -45,7 +45,7 @@ export const COPY_SECTIONS: CopySection[] = [
         label: "Subheadline",
         multiline: true,
         default:
-          "Ascend is not a habit tracker, a to-do list, or a planner. It's an AI coach that turns your ambition into a personalized execution plan — and guides you every day until you achieve it.",
+          "Ascend is not a habit tracker, a to-do list, or a planner. It's an AI coach that turns your ambition into a personalized execution plan, then guides you every day until you achieve it.",
       },
       { key: "hero.cta1", label: "Primary button", default: "Get started" },
       {
@@ -104,14 +104,14 @@ export const COPY_SECTIONS: CopySection[] = [
         label: "Plan card description",
         multiline: true,
         default:
-          "One plan. Everything included. Start with a 7-day free trial — no card required.",
+          "One plan. Everything included. Start with a 7-day free trial. No card required.",
       },
       {
         key: "pricing.trialNote",
         label: "Trial fine print",
         multiline: true,
         default:
-          "Free trial includes a preview AI analysis. Full features unlock with the plan.",
+          "The 7-day trial unlocks every feature, with up to 10 AI actions a day. Premium removes the limit.",
       },
     ],
   },
@@ -129,7 +129,7 @@ export const COPY_SECTIONS: CopySection[] = [
         label: "Opening statement — subtext",
         multiline: true,
         default:
-          "Not in bursts of motivation — in small, scheduled wins that stack.",
+          "Not in bursts of motivation, but in small scheduled wins that stack.",
       },
       {
         key: "scene3.heading",
@@ -141,7 +141,7 @@ export const COPY_SECTIONS: CopySection[] = [
         label: "Middle statement — subtext",
         multiline: true,
         default:
-          "Walk anyway. The path is still under your feet — and your plan knows the way.",
+          "Walk anyway. The path is still under your feet, and your plan knows the way.",
       },
       {
         key: "scene2.heading",
