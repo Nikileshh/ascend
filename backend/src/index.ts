@@ -649,6 +649,41 @@ app.post(
   },
 );
 
+// Replace the whole habit list (used by the onboarding review step).
+app.put(
+  "/agents/habits",
+  requireAuth,
+  requireActiveAccess,
+  (req: AuthedRequest, res) => {
+    const user = req.user!;
+    if (!user.plan)
+      return res
+        .status(404)
+        .json({ error: "No plan yet. Run onboarding first." });
+    const input = req.body?.habits;
+    if (!Array.isArray(input))
+      return res.status(400).json({ error: "habits array required" });
+    const seen = new Set<string>();
+    const habits = input
+      .map((h: { name?: unknown; frequency?: unknown; why?: unknown }) => ({
+        name: String(h?.name ?? "").trim(),
+        frequency: String(h?.frequency ?? "daily").trim() || "daily",
+        why: String(h?.why ?? "").trim() || "Building toward your goal.",
+      }))
+      .filter((h) => {
+        const key = h.name.toLowerCase();
+        if (!h.name || h.name.length > 40 || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 15);
+    user.plan.habits = habits;
+    save();
+    logActivity("habits_set", user.email, `${habits.length} habits`);
+    res.json({ habits });
+  },
+);
+
 // Remove a habit from the plan (and its tracking history)
 app.delete(
   "/agents/habits/:name",

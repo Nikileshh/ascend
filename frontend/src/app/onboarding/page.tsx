@@ -70,6 +70,10 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // After the plan is built, review the suggested habits before finishing.
+  const [reviewHabits, setReviewHabits] = useState<
+    { name: string; frequency: string; why: string }[] | null
+  >(null);
 
   useEffect(() => {
     if (!getUser()) router.replace("/login");
@@ -121,7 +125,9 @@ export default function OnboardingPage() {
     setError("");
     setLoading(true);
     try {
-      await api("/agents/orchestrate", {
+      const { plan } = await api<{
+        plan: { habits: { name: string; frequency: string; why: string }[] };
+      }>("/agents/orchestrate", {
         body: {
           goal,
           qa: questions.map((q, i) => ({
@@ -131,6 +137,23 @@ export default function OnboardingPage() {
           modules,
         },
       });
+      // Show the suggested habits for review before entering the dashboard.
+      setReviewHabits(plan.habits ?? []);
+      setLoading(false);
+    } catch (err) {
+      setError((err as Error).message);
+      setLoading(false);
+    }
+  }
+
+  async function confirmHabits() {
+    setLoading(true);
+    setError("");
+    try {
+      const cleaned = (reviewHabits ?? [])
+        .map((h) => ({ ...h, name: h.name.trim() }))
+        .filter((h) => h.name);
+      await api("/agents/habits", { method: "PUT", body: { habits: cleaned } });
       router.push("/dashboard");
     } catch (err) {
       setError((err as Error).message);
@@ -169,6 +192,93 @@ export default function OnboardingPage() {
             <div className="mx-auto mt-7 h-1.5 w-56 overflow-hidden rounded-full bg-[#1f1a14]/[0.07]">
               <div className="h-full w-1/2 animate-pulse rounded-full bg-gradient-to-r from-[#d9622b] to-[#e6c992]" />
             </div>
+          </div>
+        ) : reviewHabits !== null ? (
+          <div className="animate-fade-up">
+            <p className="font-mono text-xs font-medium tracking-[0.14em] text-[#d9622b] uppercase">
+              Almost there
+            </p>
+            <h1 className="font-display mt-3 text-[28px] leading-snug font-medium text-[#1f1a14]">
+              Your habits, ready to tweak
+            </h1>
+            <p className="mt-1.5 text-sm leading-6 text-[#6b6155]">
+              Here are the daily habits your coach built for this goal. Edit,
+              remove, or add your own before we finish.
+            </p>
+
+            <div className="mt-6 flex flex-col gap-2.5">
+              {reviewHabits.map((h, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <input
+                    value={h.name}
+                    onChange={(e) =>
+                      setReviewHabits((hs) =>
+                        hs!.map((x, j) =>
+                          j === i ? { ...x, name: e.target.value } : x,
+                        ),
+                      )
+                    }
+                    placeholder="Habit"
+                    className={`${inputDark} text-[14px]`}
+                  />
+                  <select
+                    value={
+                      ["daily", "weekdays", "weekly"].includes(
+                        h.frequency.toLowerCase(),
+                      )
+                        ? h.frequency.toLowerCase()
+                        : "daily"
+                    }
+                    onChange={(e) =>
+                      setReviewHabits((hs) =>
+                        hs!.map((x, j) =>
+                          j === i ? { ...x, frequency: e.target.value } : x,
+                        ),
+                      )
+                    }
+                    className={`${inputDark} !w-[116px] shrink-0 text-[13px]`}
+                  >
+                    <option value="daily">daily</option>
+                    <option value="weekdays">weekdays</option>
+                    <option value="weekly">weekly</option>
+                  </select>
+                  <button
+                    type="button"
+                    aria-label="Remove habit"
+                    onClick={() =>
+                      setReviewHabits((hs) => hs!.filter((_, j) => j !== i))
+                    }
+                    className="shrink-0 px-1.5 text-lg text-[#9a8f80] hover:text-[#e0567a]"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              {reviewHabits.length < 15 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setReviewHabits((hs) => [
+                      ...hs!,
+                      { name: "", frequency: "daily", why: "" },
+                    ])
+                  }
+                  className="self-start text-[13px] font-medium text-[#b04d18] hover:underline"
+                >
+                  + Add a habit
+                </button>
+              )}
+            </div>
+
+            {error && <p className="mt-3 text-sm text-[#b5551f]">{error}</p>}
+            <button
+              type="button"
+              disabled={loading}
+              onClick={confirmHabits}
+              className={`mt-6 ${buttonAccent}`}
+            >
+              {loading ? "Saving…" : "Looks good, go to my dashboard"}
+            </button>
           </div>
         ) : step === 0 ? (
           <form onSubmit={submitGoal}>
