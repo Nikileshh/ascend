@@ -56,7 +56,7 @@ Keep these two for Step 2.
    SMTP_HOST             = smtp.gmail.com
    SMTP_PORT             = 587
    SMTP_USER             = nikileshh2005@gmail.com
-   SMTP_PASS             = <your gmail app password>
+   SMTP_PASS             = <gmail app password — 16 chars, no spaces; needs 2-Step Verification ON>
    SMTP_FROM             = Ascend <nikileshh2005@gmail.com>
    ADMIN_EMAIL           = admin@ascend.app
    ADMIN_PASSWORD        = <your admin password>

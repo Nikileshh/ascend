@@ -20,11 +20,36 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendIn, setResendIn] = useState(0); // cooldown seconds
 
   function go(next: View) {
     setError("");
     setNotice("");
     setView(next);
+  }
+
+  // Ask the backend to email a fresh verification code, with feedback + a
+  // 30s cooldown so it can't be spammed.
+  async function onResend() {
+    if (resendIn > 0 || loading) return;
+    setError("");
+    setNotice("");
+    try {
+      const { message } = await api<{ message: string }>("/auth/resend", {
+        body: { email },
+      });
+      setNotice(message || "New code sent to your Gmail.");
+      setCode("");
+      let t = 30;
+      setResendIn(t);
+      const timer = setInterval(() => {
+        t -= 1;
+        setResendIn(t);
+        if (t <= 0) clearInterval(timer);
+      }, 1000);
+    } catch (err) {
+      setError((err as Error).message);
+    }
   }
 
   async function onLogin(e: React.FormEvent) {
@@ -107,6 +132,11 @@ export default function LoginPage() {
         subtitle={`Your account isn't verified yet. We just emailed a 6-digit code to ${email}.`}
       >
         <form onSubmit={onVerify} className="space-y-4">
+          {notice && (
+            <p className="rounded-xl border border-[#d9622b]/30 bg-[#d9622b]/[0.08] px-4 py-2.5 text-[13px] text-[#b04d18]">
+              {notice}
+            </p>
+          )}
           <input
             required
             inputMode="numeric"
@@ -125,10 +155,11 @@ export default function LoginPage() {
         <p className="mt-5 text-center text-sm text-[#6b6155]">
           Didn&apos;t get it? Check spam, or{" "}
           <button
-            onClick={() => api("/auth/resend", { body: { email } })}
-            className="font-medium text-[#d9622b] hover:underline"
+            onClick={onResend}
+            disabled={resendIn > 0}
+            className="font-medium text-[#d9622b] hover:underline disabled:text-[#9a8f80] disabled:no-underline"
           >
-            resend the code
+            {resendIn > 0 ? `resend in ${resendIn}s` : "resend the code"}
           </button>
         </p>
       </AuthCard>

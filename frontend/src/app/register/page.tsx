@@ -18,6 +18,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resendIn, setResendIn] = useState(0); // cooldown seconds
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -57,10 +58,19 @@ export default function RegisterPage() {
   }
 
   async function resend() {
+    if (resendIn > 0) return;
     setError("");
     try {
       await api("/auth/resend", { body: { email } });
       setNotice(`A new code is on its way to ${email}.`);
+      setCode("");
+      let t = 30;
+      setResendIn(t);
+      const timer = setInterval(() => {
+        t -= 1;
+        setResendIn(t);
+        if (t <= 0) clearInterval(timer);
+      }, 1000);
     } catch (err) {
       setError((err as Error).message);
     }
@@ -92,9 +102,10 @@ export default function RegisterPage() {
           Didn&apos;t get it? Check spam, or{" "}
           <button
             onClick={resend}
-            className="font-medium text-[#d9622b] hover:underline"
+            disabled={resendIn > 0}
+            className="font-medium text-[#d9622b] hover:underline disabled:text-[#9a8f80] disabled:no-underline"
           >
-            resend the code
+            {resendIn > 0 ? `resend in ${resendIn}s` : "resend the code"}
           </button>
         </p>
       </AuthCard>
