@@ -381,6 +381,41 @@ app.patch(
   },
 );
 
+// Customize the roadmap (edit month themes, objectives, week focuses).
+app.patch(
+  "/agents/roadmap",
+  requireAuth,
+  requireActiveAccess,
+  (req: AuthedRequest, res) => {
+    const user = req.user!;
+    const { roadmap } = req.body ?? {};
+    if (!user.plan)
+      return res
+        .status(404)
+        .json({ error: "No plan yet. Run onboarding first." });
+    if (!Array.isArray(roadmap) || roadmap.length === 0)
+      return res
+        .status(400)
+        .json({ error: "roadmap must be a non-empty array" });
+    user.plan.roadmap = roadmap.map((m, i) => ({
+      month: typeof m?.month === "number" ? m.month : i + 1,
+      title: String(m?.title ?? "").trim() || `Month ${i + 1}`,
+      objectives: Array.isArray(m?.objectives)
+        ? m.objectives.map((o: unknown) => String(o).trim()).filter(Boolean)
+        : [],
+      weeks: Array.isArray(m?.weeks)
+        ? m.weeks.map((w: { week?: number; focus?: unknown }, wi: number) => ({
+            week: typeof w?.week === "number" ? w.week : wi + 1,
+            focus: String(w?.focus ?? "").trim(),
+          }))
+        : [],
+    }));
+    save();
+    logActivity("roadmap_edit", user.email);
+    res.json({ roadmap: user.plan.roadmap });
+  },
+);
+
 // --- AI sections (one call each, per page) ---
 
 app.get(
