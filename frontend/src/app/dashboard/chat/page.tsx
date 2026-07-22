@@ -12,6 +12,7 @@ interface Message {
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [applied, setApplied] = useState<string[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
@@ -39,10 +40,12 @@ export default function ChatPage() {
       { role: "user", text, at: new Date().toISOString() },
     ]);
     try {
-      const r = await api<{ messages: Message[] }>("/agents/chat", {
-        body: { message: text },
-      });
+      const r = await api<{ messages: Message[]; applied?: string[] }>(
+        "/agents/chat",
+        { body: { message: text } },
+      );
       setMessages(r.messages);
+      if (r.applied?.length) setApplied((a) => [...a, ...r.applied!]);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -56,8 +59,9 @@ export default function ChatPage() {
         Ask your coach
       </h1>
       <p className="mt-2 text-[16px] text-[#6b6155]">
-        Doubts, blockers, questions about your plan. Your coach knows your goal
-        and progress.
+        Doubts, blockers, or changes to your plan. Try “add a 20-minute
+        meditation habit” or “move my study block to 6pm” and your coach will
+        update your dashboard.
       </p>
 
       <div className="mt-5 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto rounded-[20px] border border-[#1f1a14]/[0.09] bg-white/70 p-5 shadow-[0_4px_24px_rgba(24,24,40,0.06)] backdrop-blur-xl">
@@ -89,6 +93,13 @@ export default function ChatPage() {
             </div>
           );
         })}
+        {applied.map((a, i) => (
+          <div key={`applied-${i}`} className="flex justify-center">
+            <span className="rounded-full border border-[#34c98e]/35 bg-[#34c98e]/10 px-3 py-1 text-[11.5px] font-medium text-[#1a8f63]">
+              ✓ {a}
+            </span>
+          </div>
+        ))}
         {sending && (
           <p className="animate-pulse text-[12.5px] text-[#9a8f80]">
             Coach is typing…

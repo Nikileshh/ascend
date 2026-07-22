@@ -1,4 +1,4 @@
-import { llm, llmChat, extractJson, type ChatTurn } from "./ai.js";
+import { llm, extractJson } from "./ai.js";
 
 export interface QA {
   question: string;
@@ -777,16 +777,68 @@ First, in 1-2 sentences, tell them what their reflection reveals about how their
 }
 
 // AI Chat — continue the conversation, answer doubts, grounded in the plan
+// The coach can both reply AND change the user's plan when asked.
+export interface ChatAction {
+  action:
+    | "add_habit"
+    | "remove_habit"
+    | "set_weekday_timetable"
+    | "set_weekend_timetable"
+    | "none";
+  habitName?: string;
+  frequency?: string;
+  why?: string;
+  slots?: TimetableSlot[];
+}
+export interface ChatResult {
+  reply: string;
+  actions: ChatAction[];
+}
+
+const chatActionSchema = {
+  type: "object",
+  properties: {
+    reply: { type: "string" },
+    actions: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          action: {
+            type: "string",
+            enum: [
+              "add_habit",
+              "remove_habit",
+              "set_weekday_timetable",
+              "set_weekend_timetable",
+              "none",
+            ],
+          },
+          habitName: { type: "string" },
+          frequency: { type: "string" },
+          why: { type: "string" },
+          slots: timetableSchema,
+        },
+        required: ["action"],
+      },
+    },
+  },
+  required: ["reply", "actions"],
+} as const;
+
 export function chatAgent(
   memory: UserMemory,
   plan: Plan | undefined,
   history: { role: string; text: string }[],
   message: string,
-): Promise<string> {
+): Promise<ChatResult> {
   return withFallback(
     "Chat",
     () => chatAgentLive(memory, plan, history, message),
-    `I'm having trouble reaching the AI service right now, but here's my take: stay focused on today's plan for "${memory.goal}" — your **deep-focus block** matters more than anything else today. Ask me again in a little while and I'll give you a fuller answer.`,
+    {
+      reply: `I'm having trouble reaching the AI service right now, but here's my take: stay focused on today's plan for "${memory.goal}" — your **deep-focus block** matters more than anything else today. Ask me again in a little while and I'll give you a fuller answer.`,
+      actions: [],
+    },
   );
 }
 
@@ -794,31 +846,44 @@ async function chatAgentLive(
   memory: UserMemory,
   plan: Plan | undefined,
   history: { role: string; text: string }[],
-  _message: string,
-): Promise<string> {
+  message: string,
+): Promise<ChatResult> {
   const planText = plan
     ? `Their current plan:
-- Roadmap: ${plan.roadmap.map((m) => `Month ${m.month}: ${m.title}`).join("; ")}
-- Timetable: ${plan.timetable.map((t) => `${t.time} ${t.activity}`).join("; ")}
+- Weekday timetable: ${plan.timetable.map((t) => `${t.time} ${t.activity}`).join("; ")}
+- Weekend timetable: ${(plan.weekendTimetable ?? []).map((t) => `${t.time} ${t.activity}`).join("; ")}
 - Habits: ${plan.habits.map((h) => `${h.name} (${h.frequency})`).join(", ")}`
     : "";
-  const system = `You are the user's personal AI coach in Ascend, a goal-execution app. Be warm, direct, and practical. Answer doubts clearly in simple language; keep replies under 150 words unless they ask for detail. Mark key phrases in **bold** (double asterisks).
+  const convo = history
+    .slice(-16)
+    .map((m) => `${m.role === "user" ? "User" : "Coach"}: ${m.text}`)
+    .join("\n");
+  const prompt = `You are the user's personal AI coach in Ascend, a goal-execution app. Be warm, direct, and practical. Answer clearly in simple language; keep the "reply" under 150 words. Mark key phrases in **bold**. Continue the ongoing conversation naturally; never re-ask what they already told you.
 
-You have an ongoing relationship with this user — this is a continuing conversation, not a first meeting. Remember and refer back to what they told you earlier in the chat (names, numbers, decisions, struggles they mentioned). If they refer to something from before ("that", "the thing I said", "like last time"), resolve it from the conversation history. Never re-ask something they already answered; build on it.
+You can ALSO change their dashboard when they clearly ask you to. Available actions:
+- add_habit: fields habitName, frequency ("Daily"/"Weekly"/etc.), why (one short line)
+- remove_habit: field habitName (must match one of their existing habits)
+- set_weekday_timetable: field slots = the COMPLETE new weekday schedule as [{"time":"06:00 - 07:00","activity":"..."}] (return the whole updated list, keeping unchanged slots, not just the edited one)
+- set_weekend_timetable: field slots = the COMPLETE new weekend schedule
+
+CRITICAL RULE: if your reply says you added, removed, moved, or changed ANYTHING, you MUST include the matching object in "actions". Never claim a change in words without the action — the words alone do nothing. For plain questions or advice with no change, use an empty actions array.
+Example — user says "add a 20 min meditation habit": {"reply":"Done — I've added **Meditation** to your daily habits.","actions":[{"action":"add_habit","habitName":"Meditation","frequency":"Daily","why":"20 minutes to clear your mind and focus"}]}
 
 Long-term memory about the user:
 ${memoryText(memory)}
-${planText}`;
+${planText}
 
-  // Send the real conversation as role-based turns (last 30 messages),
-  // which already ends with the user's newest message.
-  const turns: ChatTurn[] = history.slice(-30).map((m) => ({
-    role: m.role === "user" ? "user" : "model",
-    text: m.text,
-  }));
-  // The conversation must open with a user turn
-  while (turns.length && turns[0].role !== "user") turns.shift();
-  return llmChat(system, turns);
+Conversation so far (most recent last), the final User line is the new message to respond to:
+${convo}
+New message: ${message}
+
+Respond with ONLY JSON: {"reply":"...","actions":[...]}`;
+  const text = await llm(prompt, { schema: chatActionSchema });
+  const parsed = extractJson<ChatResult>(text);
+  return {
+    reply: parsed.reply ?? "",
+    actions: Array.isArray(parsed.actions) ? parsed.actions : [],
+  };
 }
 
 // Master Orchestrator — Goal → (Planning ∥ Timetable ∥ Habit) → Plan.

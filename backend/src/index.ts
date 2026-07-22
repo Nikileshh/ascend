@@ -470,7 +470,60 @@ app.post(
       at: new Date().toISOString(),
     });
     try {
-      const reply = await chatAgent(user.memory, user.plan, user.chat, message);
+      const { reply, actions } = await chatAgent(
+        user.memory,
+        user.plan,
+        user.chat,
+        message,
+      );
+      // Apply any changes the coach decided to make to the dashboard.
+      const applied: string[] = [];
+      const pl = user.plan;
+      if (pl) {
+        for (const a of actions) {
+          if (a.action === "add_habit" && a.habitName?.trim()) {
+            const name = a.habitName.trim();
+            if (
+              !pl.habits.some(
+                (h) => h.name.toLowerCase() === name.toLowerCase(),
+              )
+            ) {
+              pl.habits.push({
+                name,
+                frequency: a.frequency?.trim() || "Daily",
+                why: a.why?.trim() || "Added from a chat with your coach",
+              });
+              applied.push(`Added habit “${name}”`);
+            }
+          } else if (a.action === "remove_habit" && a.habitName?.trim()) {
+            const name = a.habitName.trim().toLowerCase();
+            const before = pl.habits.length;
+            pl.habits = pl.habits.filter((h) => h.name.toLowerCase() !== name);
+            if (pl.habits.length < before)
+              applied.push(`Removed habit “${a.habitName.trim()}”`);
+          } else if (
+            a.action === "set_weekday_timetable" &&
+            Array.isArray(a.slots) &&
+            a.slots.length
+          ) {
+            pl.timetable = a.slots.map((s) => ({
+              time: String(s.time).trim(),
+              activity: String(s.activity).trim(),
+            }));
+            applied.push("Updated your weekday timetable");
+          } else if (
+            a.action === "set_weekend_timetable" &&
+            Array.isArray(a.slots) &&
+            a.slots.length
+          ) {
+            pl.weekendTimetable = a.slots.map((s) => ({
+              time: String(s.time).trim(),
+              activity: String(s.activity).trim(),
+            }));
+            applied.push("Updated your weekend timetable");
+          }
+        }
+      }
       user.chat.push({
         role: "coach",
         text: reply,
@@ -478,8 +531,8 @@ app.post(
       });
       if (user.chat.length > 200) user.chat.splice(0, user.chat.length - 200);
       save();
-      logActivity("chat", user.email);
-      res.json({ reply, messages: user.chat });
+      logActivity("chat", user.email, applied.join("; ") || undefined);
+      res.json({ reply, messages: user.chat, applied });
     } catch (err) {
       res.status(502).json({ error: (err as Error).message });
     }
