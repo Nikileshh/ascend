@@ -138,8 +138,16 @@ export default function DashboardLayout({
     if ("Notification" in window && Notification.permission === "default")
       Notification.requestPermission().catch(() => {});
 
-    api<{ plan: { timetable: Slot[] } }>("/agents/plan")
-      .then((r) => (timetableRef.current = r.plan.timetable))
+    api<{ plan: { timetable: Slot[]; weekendTimetable?: Slot[] } }>(
+      "/agents/plan",
+    )
+      .then((r) => {
+        const weekend = [0, 6].includes(new Date().getDay());
+        timetableRef.current =
+          weekend && r.plan.weekendTimetable?.length
+            ? r.plan.weekendTimetable
+            : r.plan.timetable;
+      })
       .catch(() => {});
 
     const check = () => {

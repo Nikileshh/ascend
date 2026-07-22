@@ -90,19 +90,26 @@ export default function OverviewPage() {
   const pct = Math.round((doneCount / plan.habits.length) * 100);
   const C = 326.73;
 
+  // Today's schedule: the weekend plan on Sat/Sun, weekday plan otherwise.
+  const isWeekend = [0, 6].includes(new Date().getDay());
+  const todaySchedule =
+    isWeekend && plan.weekendTimetable?.length
+      ? plan.weekendTimetable
+      : plan.timetable;
+
   // schedule window: previous slot, current, and the next few
   const nowMins = new Date().getHours() * 60 + new Date().getMinutes();
-  let nowIdx = plan.timetable.findIndex((s) => {
+  let nowIdx = todaySchedule.findIndex((s) => {
     const r = slotRange(s.time);
     return r && nowMins >= r.start && nowMins < r.end;
   });
   if (nowIdx === -1)
-    nowIdx = plan.timetable.findIndex((s) => {
+    nowIdx = todaySchedule.findIndex((s) => {
       const r = slotRange(s.time);
       return r && r.start > nowMins;
     });
   const from = Math.max(0, (nowIdx === -1 ? 0 : nowIdx) - 1);
-  const windowSlots = plan.timetable.slice(from, from + 5);
+  const windowSlots = todaySchedule.slice(from, from + 5);
 
   return (
     <main className="mx-auto max-w-[1120px] px-5 py-10 sm:px-8 sm:py-14 md:px-12">

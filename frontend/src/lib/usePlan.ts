@@ -22,6 +22,7 @@ export interface Plan {
     weeks?: { week: number; focus: string }[];
   }[];
   timetable: { time: string; activity: string }[];
+  weekendTimetable?: { time: string; activity: string }[];
   habits: { name: string; frequency: string; why: string }[];
 }
 

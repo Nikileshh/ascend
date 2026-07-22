@@ -15,6 +15,8 @@ interface Slot {
   activity: string;
 }
 
+type Which = "weekday" | "weekend";
+
 // "05:30 - 07:30" → is the current time inside this range?
 function isNow(time: string, now: Date) {
   const m = time.match(/^(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/);
@@ -27,9 +29,14 @@ function isNow(time: string, now: Date) {
 
 export default function TimetablePage() {
   const { plan, error: loadError } = usePlan();
-  // draft is non-null only while editing; savedSlots holds customizations
+  // Which schedule we're viewing; default to whatever today is.
+  const [which, setWhich] = useState<Which>(() =>
+    [0, 6].includes(new Date().getDay()) ? "weekend" : "weekday",
+  );
   const [draft, setDraft] = useState<Slot[] | null>(null);
-  const [savedSlots, setSavedSlots] = useState<Slot[] | null>(null);
+  // Local overrides after saving, per schedule.
+  const [savedWeekday, setSavedWeekday] = useState<Slot[] | null>(null);
+  const [savedWeekend, setSavedWeekend] = useState<Slot[] | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [savedNotice, setSavedNotice] = useState(false);
@@ -49,19 +56,26 @@ export default function TimetablePage() {
       <p className="animate-pulse p-10 text-sm text-[#6b6155]">Loading…</p>
     );
 
-  const current = savedSlots ?? plan.timetable;
+  const baseWeekend = plan.weekendTimetable ?? [];
+  const current =
+    which === "weekend"
+      ? (savedWeekend ?? baseWeekend)
+      : (savedWeekday ?? plan.timetable);
   const editing = draft !== null;
+  const isTodays =
+    which === ([0, 6].includes(new Date().getDay()) ? "weekend" : "weekday");
 
   async function saveTimetable() {
     setSaving(true);
     setError("");
     setSavedNotice(false);
     try {
-      const r = await api<{ timetable: Slot[] }>("/agents/timetable", {
-        method: "PATCH",
-        body: { timetable: draft },
-      });
-      setSavedSlots(r.timetable);
+      const r = await api<{ timetable: Slot[]; weekendTimetable: Slot[] }>(
+        "/agents/timetable",
+        { method: "PATCH", body: { timetable: draft, which } },
+      );
+      setSavedWeekday(r.timetable);
+      setSavedWeekend(r.weekendTimetable);
       setDraft(null);
       setSavedNotice(true);
     } catch (err) {
@@ -75,6 +89,12 @@ export default function TimetablePage() {
     setDraft(draft!.map((s, j) => (j === i ? { ...s, [field]: value } : s)));
   }
 
+  function switchTo(next: Which) {
+    if (editing) return; // finish editing before switching
+    setWhich(next);
+    setSavedNotice(false);
+  }
+
   return (
     <main className="mx-auto max-w-[820px] px-5 py-10 sm:px-8 sm:py-14 md:px-12">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -83,7 +103,7 @@ export default function TimetablePage() {
             Timetable
           </h1>
           <p className="mt-2 text-[16px] text-[#6b6155]">
-            Couldn&apos;t finish a task, or life changed? Rearrange it your way
+            Separate plans for weekdays and weekends. Rearrange either one;
             reminders follow whatever you set here.
           </p>
         </div>
@@ -100,9 +120,32 @@ export default function TimetablePage() {
         )}
       </div>
 
+      {/* Weekday / Weekend switch */}
+      <div className="mt-5 inline-flex rounded-full border border-[#1f1a14]/10 bg-white/70 p-1 backdrop-blur-xl">
+        {(["weekday", "weekend"] as Which[]).map((w) => (
+          <button
+            key={w}
+            onClick={() => switchTo(w)}
+            disabled={editing}
+            className={`rounded-full px-4 py-1.5 text-[13px] font-medium capitalize transition-colors disabled:opacity-50 ${
+              which === w
+                ? "bg-gradient-to-b from-[#2a231b] to-[#1f1a14] text-[#f7f1e6]"
+                : "text-[#6b6155] hover:text-[#1f1a14]"
+            }`}
+          >
+            {w}
+            {which === w && isTodays && (
+              <span className="ml-1.5 text-[10px] tracking-wider text-[#e6c992] uppercase">
+                today
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
       {savedNotice && (
         <p className="mt-4 rounded-xl border border-[#34c98e]/35 bg-[#34c98e]/10 px-4 py-2.5 text-[13px] text-[#1a8f63]">
-          Timetable saved ✓
+          {which === "weekend" ? "Weekend" : "Weekday"} timetable saved ✓
         </p>
       )}
 
@@ -161,10 +204,15 @@ export default function TimetablePage() {
               </button>
             </div>
           </div>
+        ) : current.length === 0 ? (
+          <p className="p-6 text-center text-sm text-[#6b6155]">
+            No weekend schedule yet. Tap <strong>Customize</strong> to build
+            one, or start a new goal so your coach generates it.
+          </p>
         ) : (
           <div className="flex flex-col">
             {current.map((slot, i) => {
-              const active = now ? isNow(slot.time, now) : false;
+              const active = isTodays && now ? isNow(slot.time, now) : false;
               return (
                 <div
                   key={i}

@@ -404,35 +404,114 @@ Small adjustments, kept consistently, are how goals get finished.${signoff}`,
   );
 }
 
-export function sendDailyPlanEmail(user: User) {
+export function sendDailyPlanEmail(
+  user: User,
+  slots?: { time: string; activity: string }[],
+) {
   const pl = user.plan;
   if (!pl) return;
+  const schedule = slots ?? pl.timetable;
   const first = user.name.split(" ")[0] || user.name;
   notify(
     user.email,
-    `Good morning ${first} — today's plan ☀️`,
+    `Good morning ${first}, today's plan ☀️`,
     `Good morning ${user.name},
 
 Here's your day, built for "${pl.goal}":
 
-${pl.timetable.map((t) => `  ${t.time}  ${t.activity}`).join("\n")}
+${schedule.map((t) => `  ${t.time}  ${t.activity}`).join("\n")}
 
 TODAY'S HABITS
 ${pl.habits.map((h) => `  ☐ ${h.name}`).join("\n")}
 
-Check them off in the app as you go — your streak is counting on you.${signoff}`,
+Check them off in the app as you go. Your streak is counting on you.${signoff}`,
     shell({
-      preview: `Good morning ${first} — here's your day.`,
+      preview: `Good morning ${first}, here's your day.`,
       eyebrow: "Good morning ☀️",
       heading: `Good morning, ${first}`,
       body:
         p(`Here's your day, built for <strong>${esc(pl.goal)}</strong>:`) +
-        scheduleHtml(pl.timetable) +
+        scheduleHtml(schedule) +
         `<div style="font-family:${sans};font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:${C.faint};font-weight:600;margin:6px 0 8px;">Today's habits</div>` +
         bulletsHtml(pl.habits.map((h) => h.name)) +
         btn(`${APP_URL}/dashboard`, "Check them off") +
         p(
           `<span style="color:${C.faint};">Your streak is counting on you.</span>`,
+        ),
+    }),
+  );
+}
+
+/** Friday evening: ask the user to set their weekend plan. */
+export function sendWeekendPlanningEmail(user: User) {
+  const pl = user.plan;
+  if (!pl) return;
+  const first = user.name.split(" ")[0] || user.name;
+  notify(
+    user.email,
+    `${first}, what's the plan for this weekend?`,
+    `Hi ${user.name},
+
+It's Friday. Before the weekend starts, take two minutes to tell your coach what you're up to — movies, sports, friends, family, rest, or catching up on "${pl.goal}".
+
+Your weekend schedule is lighter than a weekday, but a short focus block keeps your momentum alive. Open Ascend, check your weekend plan, and adjust it to match what you're actually doing.${signoff}`,
+    shell({
+      preview: "Set your weekend plan in two minutes.",
+      eyebrow: "Friday check-in",
+      heading: `${first}, plan your weekend`,
+      body:
+        p(
+          "It's Friday. Tell your coach what your weekend looks like — rest, sports, friends, family, or catching up — and it will shape your weekend schedule around it.",
+        ) +
+        p(
+          `Your weekend keeps a shorter focus block for <strong>${esc(pl.goal)}</strong> so momentum never fully stops.`,
+        ) +
+        btn(`${APP_URL}/dashboard/timetable`, "Review my weekend plan") +
+        p(
+          `<span style="color:${C.faint};">A little on Saturday and Sunday keeps Monday easy.</span>`,
+        ),
+    }),
+  );
+}
+
+/** Nightly accountability: did you follow today's plan? */
+export function sendDailyCheckinEmail(
+  user: User,
+  slots?: { time: string; activity: string }[],
+) {
+  const pl = user.plan;
+  if (!pl) return;
+  const schedule = slots ?? pl.timetable;
+  const first = user.name.split(" ")[0] || user.name;
+  // Highlight the key blocks worth accounting for (study / deep focus / work).
+  const keyBlocks = schedule.filter((s) =>
+    /stud|focus|deep|practice|revis|work|session|learn|train/i.test(s.activity),
+  );
+  notify(
+    user.email,
+    `${first}, how did today go?`,
+    `Hi ${user.name},
+
+Quick end-of-day check for "${pl.goal}":
+
+${(keyBlocks.length ? keyBlocks : schedule).map((t) => `  ${t.time}  ${t.activity}`).join("\n")}
+
+Did you get your key blocks done? If you missed one — like your deep-focus or study block — open Ascend and tell your coach what you did instead. It'll suggest a realistic way to make it up tomorrow. Honesty here is what makes the plan actually work.${signoff}`,
+    shell({
+      preview: "Did you get your key blocks done today?",
+      eyebrow: "Nightly check-in",
+      heading: `${first}, how did today go?`,
+      body:
+        p(
+          `Did you get today's key blocks done for <strong>${esc(pl.goal)}</strong>?`,
+        ) +
+        scheduleHtml(keyBlocks.length ? keyBlocks : schedule) +
+        p(
+          "Missed one, like your deep-focus or study block? Tell your coach what you did instead and it will suggest a realistic way to catch up.",
+        ) +
+        btn(`${APP_URL}/dashboard/reflection`, "Check in with my coach") +
+        p(
+          `<span style="color:${C.faint};">Honesty here is what makes the plan actually work.</span>`,
         ),
     }),
   );

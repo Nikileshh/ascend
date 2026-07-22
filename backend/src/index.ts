@@ -40,6 +40,8 @@ import {
   sendTaskStartingEmail,
   sendPremiumActivatedEmail,
   sendPaymentSubmittedAdminAlert,
+  sendWeekendPlanningEmail,
+  sendDailyCheckinEmail,
 } from "./email.js";
 import {
   analyticsAgent,
@@ -345,7 +347,7 @@ app.patch(
   requireActiveAccess,
   (req: AuthedRequest, res) => {
     const user = req.user!;
-    const { timetable } = req.body ?? {};
+    const { timetable, which } = req.body ?? {};
     if (!user.plan)
       return res
         .status(404)
@@ -359,14 +361,23 @@ app.patch(
       return res
         .status(400)
         .json({ error: "timetable must be [{time, activity}]" });
-    user.plan.timetable = timetable.map((t) => ({
+    const clean = timetable.map((t) => ({
       time: t.time.trim(),
       activity: t.activity.trim(),
     }));
+    if (which === "weekend") user.plan.weekendTimetable = clean;
+    else user.plan.timetable = clean;
     save();
-    logActivity("timetable_edit", user.email);
+    logActivity(
+      "timetable_edit",
+      user.email,
+      which === "weekend" ? "weekend" : "weekday",
+    );
     sendTimetableUpdatedEmail(user);
-    res.json({ timetable: user.plan.timetable });
+    res.json({
+      timetable: user.plan.timetable,
+      weekendTimetable: user.plan.weekendTimetable ?? [],
+    });
   },
 );
 
@@ -806,11 +817,24 @@ function istDate(iso: string) {
 }
 function istNow() {
   const ist = new Date(Date.now() + 5.5 * 3_600_000);
+  const dow = ist.getUTCDay(); // 0 = Sun … 6 = Sat
   return {
     date: ist.toISOString().slice(0, 10),
     hours: ist.getUTCHours(),
+    minutes: ist.getUTCMinutes(),
+    dow,
+    isWeekend: dow === 0 || dow === 6,
+    isFriday: dow === 5,
     hhmm: `${String(ist.getUTCHours()).padStart(2, "0")}:${String(ist.getUTCMinutes()).padStart(2, "0")}`,
   };
+}
+
+// The schedule that applies today: weekend plan on Sat/Sun, weekday otherwise.
+// Falls back to the weekday timetable for plans created before weekend support.
+function todaysTimetable(plan: NonNullable<User["plan"]>) {
+  return istNow().isWeekend && plan.weekendTimetable?.length
+    ? plan.weekendTimetable
+    : plan.timetable;
 }
 
 // --- Daily morning briefing: email each user their tasks for the day ---
@@ -825,7 +849,38 @@ setInterval(
         (u) => u.plan && u.verified !== false && u.role === "user",
       );
       console.log(`Sending daily plan emails to ${recipients.length} users`);
-      for (const u of recipients) sendDailyPlanEmail(u);
+      for (const u of recipients)
+        sendDailyPlanEmail(u, todaysTimetable(u.plan!));
+    }
+  },
+  10 * 60 * 1000,
+);
+
+// --- Friday evening: ask each user what their weekend looks like ---
+let lastWeekendPromptDate = "";
+// --- Nightly accountability check-in: did you follow today's plan? ---
+let lastCheckinDate = "";
+setInterval(
+  () => {
+    const now = istNow();
+    const users = () =>
+      allUsers().filter(
+        (u) => u.plan && u.verified !== false && u.role === "user",
+      );
+    // Friday ~6 PM IST: prompt for the weekend plan.
+    if (
+      now.isFriday &&
+      now.hours === 18 &&
+      lastWeekendPromptDate !== now.date
+    ) {
+      lastWeekendPromptDate = now.date;
+      for (const u of users()) sendWeekendPlanningEmail(u);
+    }
+    // Every night ~9 PM IST: accountability check-in on the day's plan.
+    if (now.hours === 21 && lastCheckinDate !== now.date) {
+      lastCheckinDate = now.date;
+      for (const u of users())
+        sendDailyCheckinEmail(u, todaysTimetable(u.plan!));
     }
   },
   10 * 60 * 1000,
@@ -847,7 +902,7 @@ setInterval(() => {
   for (const u of allUsers()) {
     if (!u.plan || u.verified === false || u.role !== "user") continue;
     if (u.modules && !u.modules.includes("timetable")) continue; // opted out
-    for (const slot of u.plan.timetable) {
+    for (const slot of todaysTimetable(u.plan)) {
       const m = slot.time.match(/^(\d{1,2}):(\d{2})/);
       if (!m) continue;
       const slotStart = `${m[1].padStart(2, "0")}:${m[2]}`;

@@ -54,7 +54,8 @@ export interface Plan {
   goal: string;
   profile: GoalProfile;
   roadmap: RoadmapMonth[];
-  timetable: TimetableSlot[];
+  timetable: TimetableSlot[]; // weekday schedule (Mon–Fri)
+  weekendTimetable: TimetableSlot[]; // Sat–Sun schedule
   habits: Habit[];
   createdAt: string;
 }
@@ -260,15 +261,33 @@ export function goalAgentQuestions(
       ],
     },
     {
-      question: "What other commitments shape your day?",
+      question: "What does a normal WEEKDAY look like for you?",
       type: "choice",
       multi: true,
       options: [
-        "Full-time job",
-        "College / school",
-        "Part-time work or freelancing",
-        "Family responsibilities",
-        "Mostly free right now",
+        "Classes / lectures",
+        "Job or work shift",
+        "Self-study time",
+        "Gym or sports",
+        "Commute / travel",
+        "Chores & errands",
+        "Time with family",
+        "Mostly free",
+      ],
+    },
+    {
+      question: "What do you usually do on WEEKENDS?",
+      type: "choice",
+      multi: true,
+      options: [
+        "Sleep in and rest",
+        "Sports or gym",
+        "Movies or gaming",
+        "Out with friends",
+        "Family time",
+        "Errands & chores",
+        "Catch up on studies/work",
+        "Side projects / hobbies",
       ],
     },
     {
@@ -291,9 +310,9 @@ async function goalAgentQuestionsLive(
   const text = await llm(
     `You are the Goal Analysis Agent of Ascend, a personal AI coaching app.
 A user has this goal: "${goal}".
-Create exactly 8 short onboarding questions, each with tap-to-select answer options, covering in order: 1) current level/experience, 2) target deadline or attempt, 3) hours available per day, 4) usual wake-up time, 5) usual sleep time, 6) weakest area for this goal, 7) other commitments (work/college/family), 8) when they focus best. Tailor the wording and the options to this specific goal.
-Each item: "question" (short), "type" ("time" for the wake-up and sleep questions, otherwise "choice"), "options" (4-6 short, realistic answers relevant to that question — for "time" questions give exactly these 12 clock times: wake-up ${JSON.stringify(WAKE_TIMES)}, sleep ${JSON.stringify(SLEEP_TIMES)}), and "multi" (true only where several answers can apply at once — typically the weakest-areas and commitments questions; false elsewhere). Never include an "Other" option — the app adds one automatically.
-Respond with ONLY a JSON array of 8 objects {question, type, options, multi}.`,
+Create exactly 9 short onboarding questions, each with tap-to-select answer options, covering in order: 1) current level/experience, 2) target deadline or attempt, 3) hours available per day, 4) usual wake-up time, 5) usual sleep time, 6) weakest area for this goal, 7) what a normal WEEKDAY looks like for them (classes, job, self-study, gym, chores, family, free…), 8) what they usually do on WEEKENDS (rest, sports, movies/gaming, friends, family, errands, hobbies…), 9) when they focus best. Tailor the wording and the options to this specific goal.
+Each item: "question" (short), "type" ("time" for the wake-up and sleep questions, otherwise "choice"), "options" (4-6 short, realistic answers relevant to that question — for "time" questions give exactly these 12 clock times: wake-up ${JSON.stringify(WAKE_TIMES)}, sleep ${JSON.stringify(SLEEP_TIMES)}), and "multi" (true where several answers can apply at once — the weakest-areas, weekday, and weekend questions; false elsewhere). Never include an "Other" option — the app adds one automatically.
+Respond with ONLY a JSON array of 9 objects {question, type, options, multi}.`,
     { schema: questionsSchema },
   );
   const parsed = extractJson<OnboardingQuestion[]>(text);
@@ -329,11 +348,18 @@ async function goalAgentAnalyzeLive(
   const text = await llm(
     `You are the Goal Analysis Agent. Goal: "${goal}".
 User answers:\n${qaText(qa)}
-Assess the goal. Respond with ONLY JSON:
+Assess the goal. For "estimatedMonths": if the user stated a deadline, timeline, or target date/attempt (e.g. "in 3 months", "by 2027", "next year"), set estimatedMonths to the number of months from now until that deadline and honor it EXACTLY. Only estimate a realistic number if they gave no timeline. Clamp between 1 and 36.
+Respond with ONLY JSON:
 {"goalDifficulty":"Low|Medium|High|Very High","estimatedMonths":number,"dailyHours":number,"weeklyHours":number,"confidence":number (0-100),"skillsRequired":[strings],"risks":[strings]}`,
     { schema: profileSchema },
   );
-  return extractJson<GoalProfile>(text);
+  const profile = extractJson<GoalProfile>(text);
+  // Keep the timeline sane if the model returns something wild.
+  profile.estimatedMonths = Math.max(
+    1,
+    Math.min(Math.round(profile.estimatedMonths) || 12, 36),
+  );
+  return profile;
 }
 
 // 2. Planning Agent — monthly roadmap
@@ -406,7 +432,7 @@ function sampleRoadmap(profile: GoalProfile): RoadmapMonth[] {
       ],
     ],
   ] as const;
-  const months = Math.max(3, Math.min(profile.estimatedMonths, 12));
+  const months = Math.max(3, Math.min(profile.estimatedMonths, 18));
   return Array.from({ length: months }, (_, i) => {
     const [title, objectives] = phases[Math.min(i, phases.length - 1)];
     // Break the month's objectives across 4 weeks so progress is trackable
@@ -432,10 +458,12 @@ async function planningAgentLive(
   qa: QA[],
   profile: GoalProfile,
 ): Promise<RoadmapMonth[]> {
+  const spanMonths = Math.max(1, Math.min(profile.estimatedMonths, 18));
   const text = await llm(
-    `You are the Planning Agent. Goal: "${goal}" (difficulty ${profile.goalDifficulty}, ~${profile.estimatedMonths} months, ${profile.weeklyHours}h/week).
+    `You are the Planning Agent. Goal: "${goal}" (difficulty ${profile.goalDifficulty}, ${profile.weeklyHours}h/week).
 User answers:\n${qaText(qa)}
-Create a DETAILED roadmap covering all ${Math.min(profile.estimatedMonths, 12)} months (or up to 12). Each month needs a clear theme, 4-6 specific monthly objectives, AND a week-by-week breakdown: exactly 4 weeks, each with one concrete thing to complete that week (what to finish in week 1, week 2, week 3, week 4). Write in simple, encouraging language a beginner can understand. Respond with ONLY a JSON array:
+The user needs to reach this goal in about ${profile.estimatedMonths} months. Create a roadmap of EXACTLY ${spanMonths} months that is paced to finish right at that deadline: month 1 is where they are now, and the FINAL month (month ${spanMonths}) is the goal-achievement / final-preparation month (e.g. the exam, launch, or event itself). Distribute the work realistically across the whole timeline — do not cram everything early or leave the end empty.
+Each month needs a clear theme, 4-6 specific monthly objectives, AND a week-by-week breakdown: exactly 4 weeks, each with one concrete thing to complete that week. Write in simple, encouraging language a beginner can understand. Respond with ONLY a JSON array:
 [{"month":1,"title":"...","objectives":["...","...","...","..."],"weeks":[{"week":1,"focus":"..."},{"week":2,"focus":"..."},{"week":3,"focus":"..."},{"week":4,"focus":"..."}]}]`,
     { schema: roadmapSchema },
   );
@@ -565,12 +593,56 @@ async function timetableAgentLive(
   profile: GoalProfile,
 ): Promise<TimetableSlot[]> {
   const text = await llm(
-    `You are the Timetable Agent. Build a realistic weekday timetable (not generic) for a user with goal "${goal}" who can invest ${profile.dailyHours}h/day, respecting their commitments and preferred timings from these answers:\n${qaText(qa)}
-IMPORTANT: if the user states specific focus/study hours (e.g. "5:30am to 7:30am"), the timetable MUST place their deep-focus block at exactly those times. If they state their wake-up and sleep times, the timetable MUST start at their wake-up time and end at their sleep time. Cover the full day from wake-up to sleep. Respond with ONLY a JSON array:
+    `You are the Timetable Agent. Build a realistic WEEKDAY (Mon–Fri) timetable (not generic) for a user with goal "${goal}" who can invest ${profile.dailyHours}h/day, respecting their weekday routine, commitments, and preferred timings from these answers:\n${qaText(qa)}
+IMPORTANT: work around what they told you their weekday looks like (classes, job, commute…). If the user states specific focus/study hours (e.g. "5:30am to 7:30am"), the timetable MUST place their deep-focus block at exactly those times. If they state their wake-up and sleep times, the timetable MUST start at their wake-up time and end at their sleep time. Cover the full day from wake-up to sleep. Respond with ONLY a JSON array:
 [{"time":"06:00 - 07:00","activity":"..."}]`,
     { schema: timetableSchema },
   );
   return extractJson<TimetableSlot[]>(text);
+}
+
+// 3b. Weekend Timetable Agent — a lighter Sat/Sun schedule that respects their
+// rest and social plans but keeps steady progress toward the goal.
+export function weekendTimetableAgent(
+  goal: string,
+  qa: QA[],
+  profile: GoalProfile,
+): Promise<TimetableSlot[]> {
+  return withFallback(
+    "Weekend Timetable Agent",
+    () => weekendTimetableAgentLive(goal, qa, profile),
+    sampleWeekendTimetable(qa),
+  );
+}
+
+async function weekendTimetableAgentLive(
+  goal: string,
+  qa: QA[],
+  profile: GoalProfile,
+): Promise<TimetableSlot[]> {
+  const text = await llm(
+    `You are the Timetable Agent building a WEEKEND (Saturday/Sunday) schedule for a user with goal "${goal}". Weekends are different from weekdays: lighter, with real rest and the social/leisure things they told you they enjoy (movies, sports, friends, family, hobbies). Base it on these answers:\n${qaText(qa)}
+Rules: keep a SHORTER but still meaningful goal-work block (about half of a weekday's ${profile.dailyHours}h) so momentum never fully stops, then genuinely schedule their weekend activities and rest. Respect their wake-up and sleep times (they may wake later on weekends). Cover the full day from wake-up to sleep. Make it feel like a good, balanced weekend — not a punishment. Respond with ONLY a JSON array:
+[{"time":"08:00 - 09:00","activity":"..."}]`,
+    { schema: timetableSchema },
+  );
+  return extractJson<TimetableSlot[]>(text);
+}
+
+function sampleWeekendTimetable(qa: QA[]): TimetableSlot[] {
+  void qa;
+  return [
+    { time: "08:30 - 09:30", activity: "Slow start, breakfast, light stretch" },
+    {
+      time: "09:30 - 11:30",
+      activity: "Focused goal work (lighter weekend block)",
+    },
+    { time: "11:30 - 13:00", activity: "Free time / hobby" },
+    { time: "13:00 - 14:00", activity: "Lunch and a real break" },
+    { time: "14:00 - 17:00", activity: "Out with friends / sports / movie" },
+    { time: "17:00 - 18:00", activity: "Quick review of the week's progress" },
+    { time: "18:00 - 22:00", activity: "Relax, family time, recharge" },
+  ];
 }
 
 // 4. Habit Agent — personalized habits
@@ -753,9 +825,10 @@ ${planText}`;
 // Gemini handles concurrent requests, so the three run in parallel for speed.
 export async function orchestrate(goal: string, qa: QA[]): Promise<Plan> {
   const profile = await goalAgentAnalyze(goal, qa);
-  const [roadmap, timetable, habits] = await Promise.all([
+  const [roadmap, timetable, weekendTimetable, habits] = await Promise.all([
     planningAgent(goal, qa, profile),
     timetableAgent(goal, qa, profile),
+    weekendTimetableAgent(goal, qa, profile),
     habitAgent(goal, qa),
   ]);
   return {
@@ -763,6 +836,7 @@ export async function orchestrate(goal: string, qa: QA[]): Promise<Plan> {
     profile,
     roadmap,
     timetable,
+    weekendTimetable,
     habits,
     createdAt: new Date().toISOString(),
   };
