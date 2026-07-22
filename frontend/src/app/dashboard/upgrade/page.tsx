@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import { api, getUser } from "@/lib/api";
+import { useIsClient } from "@/lib/useIsClient";
 import {
   GlassCard,
   inputDark,
@@ -37,6 +38,14 @@ export default function UpgradePage() {
   const [busy, setBusy] = useState(false);
   // null = still probing, true = QR present, false = fall back to UPI id
   const [qrOk, setQrOk] = useState<boolean | null>(null);
+  // Trial ended for a non-premium user → hard paywall messaging.
+  const isClient = useIsClient();
+  const sessionUser = isClient ? getUser() : null;
+  const locked =
+    !!sessionUser &&
+    !sessionUser.premium &&
+    sessionUser.role !== "admin" &&
+    !!sessionUser.trialExpired;
 
   const load = () =>
     api<BillingInfo>("/billing/info")
@@ -84,14 +93,31 @@ export default function UpgradePage() {
           Ascend Premium
         </p>
         <h1 className="font-display mt-2 text-[32px] leading-tight font-medium tracking-tight text-[#1f1a14] sm:text-[42px]">
-          {info?.premium ? "You're Premium ✦" : "Unlock the full climb"}
+          {info?.premium
+            ? "You're Premium ✦"
+            : locked
+              ? "Your free trial has ended"
+              : "Unlock the full climb"}
         </h1>
         <p className="mt-2 max-w-xl text-[15px] text-[#6b6155]">
           {info?.premium
             ? "Your account has full access to every Ascend feature. Thank you for supporting the climb."
-            : `Everything Ascend can do, for ₹${info?.price ?? 250}/month.`}
+            : locked
+              ? `Subscribe for ₹${info?.price ?? 250}/month to continue. Your goal, roadmap, habits and progress are all saved — you pick up exactly where you left off.`
+              : `Everything Ascend can do, for ₹${info?.price ?? 250}/month.`}
         </p>
       </header>
+
+      {locked && !info?.premium && (
+        <div className="mb-6 flex items-start gap-3 rounded-2xl border border-[#d9622b]/30 bg-[#d9622b]/[0.07] px-5 py-4">
+          <span className="text-lg">🔒</span>
+          <p className="text-[14px] leading-6 text-[#4a4239]">
+            Your 7-day free trial is over, so the dashboard is locked. Nothing
+            is deleted — the moment your payment is confirmed, your full plan
+            and streaks come right back.
+          </p>
+        </div>
+      )}
 
       {info?.premium ? (
         <GlassCard gradient className="max-w-xl">

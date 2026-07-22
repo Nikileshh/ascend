@@ -37,7 +37,7 @@ export function Pricing() {
               {plan.name}
             </h3>
             <span className="rounded-full bg-gradient-to-br from-[#d9622b] to-[#b04d18] px-3 py-1 text-xs font-medium text-white shadow-[0_0_16px_rgba(217,98,43,0.32)]">
-              14-day free trial
+              7-day free trial
             </span>
           </div>
           <p className="mt-4">

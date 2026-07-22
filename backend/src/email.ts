@@ -260,7 +260,7 @@ Let's begin your ascent.${signoff}`,
       heading: `Welcome to Ascend, ${name}`,
       body:
         p(
-          "Your Gmail is verified and your account is active. You've got a <strong>14-day free trial</strong> to explore everything.",
+          "Your Gmail is verified and your account is active. You've got a <strong>7-day free trial</strong> to explore everything.",
         ) +
         p(
           "Next step: tell your AI coach your goal. It'll interview you, then build your personalized roadmap, daily timetable, and habit system.",

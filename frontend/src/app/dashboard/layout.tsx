@@ -93,6 +93,10 @@ export default function DashboardLayout({
   const user = freshUser ?? (isClient ? getUser() : null);
   const name = user?.name ?? "";
   const premium = !!user && (!!user.premium || user.role === "admin");
+  const daysLeft = user?.daysLeft ?? 0;
+  // Locked = a non-premium user whose 7-day trial has ended. They may only see
+  // the upgrade page (to pay); everything else redirects there.
+  const locked = !!user && !premium && !!user.trialExpired;
 
   useEffect(() => {
     if (!getUser()) {
@@ -106,6 +110,12 @@ export default function DashboardLayout({
       })
       .catch(() => {});
   }, [router]);
+
+  // Once we know the trial has ended, keep them on the upgrade page only.
+  useEffect(() => {
+    if (locked && pathname !== "/dashboard/upgrade")
+      router.replace("/dashboard/upgrade");
+  }, [locked, pathname, router]);
 
   const initials = name
     .split(" ")
@@ -234,9 +244,15 @@ export default function DashboardLayout({
               href="/dashboard/upgrade"
               className="mb-3 block rounded-xl bg-gradient-to-b from-[#d9622b] to-[#b04d18] px-3.5 py-3 text-white shadow-[0_10px_24px_-10px_rgba(217,98,43,0.7)] transition-transform hover:-translate-y-0.5"
             >
-              <p className="text-[13px] font-semibold">Go Premium ✦</p>
+              <p className="text-[13px] font-semibold">
+                {locked
+                  ? "Trial ended"
+                  : daysLeft <= 1
+                    ? "Last day of trial"
+                    : `${daysLeft} days left in trial`}
+              </p>
               <p className="mt-0.5 text-[11.5px] text-white/80">
-                Unlock every feature
+                {locked ? "Subscribe to continue" : "Upgrade to keep access"}
               </p>
             </Link>
           )}
@@ -349,7 +365,17 @@ export default function DashboardLayout({
           </div>
         )}
 
-        {children}
+        {/* Locked (trial ended) users only ever see the upgrade page; while
+            the redirect to it settles, don't flash the gated content. */}
+        {locked && pathname !== "/dashboard/upgrade" ? (
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <p className="animate-pulse text-sm text-[#6b6155]">
+              Your free trial has ended — taking you to upgrade…
+            </p>
+          </div>
+        ) : (
+          children
+        )}
       </div>
     </div>
   );

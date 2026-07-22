@@ -230,7 +230,7 @@ export function isPremium(user: User) {
   return user.role === "admin" || user.premium === true;
 }
 
-const TRIAL_DAYS = 14;
+const TRIAL_DAYS = 7;
 
 export function trialInfo(user: User) {
   const trialEndsAt = new Date(

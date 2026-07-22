@@ -90,21 +90,21 @@ export const COPY_SECTIONS: CopySection[] = [
       {
         key: "pricing.heading",
         label: "Heading",
-        default: "One plan. Two weeks free.",
+        default: "One plan. One week free.",
       },
       {
         key: "pricing.sub",
         label: "Subtext",
         multiline: true,
         default:
-          "Try Ascend free for 14 days, then ₹250/month. No tiers, no upsells.",
+          "Try Ascend free for 7 days, then ₹250/month. No tiers, no upsells.",
       },
       {
         key: "pricing.description",
         label: "Plan card description",
         multiline: true,
         default:
-          "One plan. Everything included. Start with a 14-day free trial — no card required.",
+          "One plan. Everything included. Start with a 7-day free trial — no card required.",
       },
       {
         key: "pricing.trialNote",

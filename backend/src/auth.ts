@@ -58,3 +58,26 @@ export function requireAdmin(
     return res.status(403).json({ error: "Admin access required" });
   next();
 }
+
+/**
+ * Gate for app features: admins and premium users always pass; trial users
+ * pass until their 7-day trial ends, then get a 402 (must subscribe). Their
+ * account and data are untouched — access resumes the moment they go premium.
+ * Must run after requireAuth. Billing routes are intentionally NOT gated so an
+ * expired user can still pay.
+ */
+export function requireActiveAccess(
+  req: AuthedRequest,
+  res: Response,
+  next: NextFunction,
+) {
+  const user = req.user!;
+  if (user.role === "admin" || user.premium === true) return next();
+  if (trialInfo(user).trialExpired)
+    return res.status(402).json({
+      error:
+        "Your 7-day free trial has ended. Subscribe to Ascend (₹250/month) to continue — your plan and progress are saved.",
+      trialExpired: true,
+    });
+  next();
+}
